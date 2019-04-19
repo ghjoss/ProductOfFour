@@ -5,21 +5,22 @@
 #
 import sys
 import collections
+
 debug = 0
 if debug == 0:
 	testNode = ""
-	n = 5550 				# top of range, will actually iterate n - 1
+	n = 5551 				# top of range, will actually iterate n - 1
 	incMax = 31
 else:
 	testNode="TEST_"
 	n = 500
 	incMax = 2
 
-sheet = 1
-report = 1
+sheet = 1					# 1=generate spreadsheet data, 0=no spreadsheet data
+report = 1					# 1=generate text report, 0=no text report
 
 if sheet == 0 and report == 0:
-	print("Must run to generate either sheet or report or both, but not neither.")
+	print("Must run to generate either sheet or text report or both, but not neither.")
 	exit()
 
 primes=[2,3,			# see note following to see why 2&3 are not prime factors 
@@ -5029,10 +5030,10 @@ primesDict = {} # add the p
 for w in primes:
 	primesDict[w] = True
 
-squaresDict = {}
-squaresList = {}
-factorsDict = {}
-factorsList = []
+squaresDict = {}			# dictionary of lists of the generated squares and square roots. Key = square number
+squaresList = {}			# list of generated squares and square roots
+factorsDict = {}			# dictionary of lists of the prime factors of the square roots
+factorsList = []			# list of the prime factors of the square roots
 
 
 if sheet == 1:				
@@ -5042,7 +5043,7 @@ if report == 1:
 	headerTXT = "{0:>8}{1:^30}num**0.5(factors)".format("i","num")
 	headerLTXT = "-" * 72
 					
-for increment in range(1,incMax):#1):
+for increment in range(1,incMax):
 	inc4 = increment ** 4
 
 	header0 = "increment == {0:d}".format(increment)
@@ -5087,7 +5088,7 @@ for increment in range(1,incMax):#1):
 		factorizationTestNum = sqrtNum = increment*i + i1 * i1  #factorizationTestNum = sqrtNum = i*increment + (i+increment)²
 		#num = (i + i1**2)**2
 		num = sqrtNum * sqrtNum
-		if num in squaresDict: # have we already seen this number when processing a previous arithmetic increment?
+		if num in squaresDict: # have we already seen this number when processing a previous arithmetic sequence?
 			#yes, append the current value of i and the increment to the list entry for this number
 			l = squaresDict[num]	#get the list
 			l.append(i)				#add current '1st of the four arithmetic sequence' value (i)

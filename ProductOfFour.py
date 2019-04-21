@@ -5083,10 +5083,10 @@ for increment in range(1,incMax):
 		#num = i * (i + increment) * (i + 2*increment) * (i + 3*increment) + inc4
 		#factorizationTestNum = sqrtNum = num ** 0.5
 		# alternative, equivalent values
-		i1 = i + increment
-		
-		factorizationTestNum = sqrtNum = increment*i + i1 * i1  #factorizationTestNum = sqrtNum = i*increment + (i+increment)²
-		#num = (i + i1**2)**2
+		i1Sum = i + increment
+		i1Prod = i*increment
+		factorizationTestNum = sqrtNum = i1Prod + i1Sum * i1Sum  #factorizationTestNum = sqrtNum = i*increment + (i+increment)²
+		#num = (iProd + i1Sum**2)**2
 		num = sqrtNum * sqrtNum
 		if num in squaresDict: # have we already seen this number when processing a previous arithmetic sequence?
 			#yes, append the current value of i and the increment to the list entry for this number
@@ -5218,7 +5218,7 @@ if report == 1:
 			elif idx == 1:
 				sqrt = word
 			elif idx == 2:
-				i1 = word
+				i1Sum = word
 			elif idx == 3:
 				inc1 = word
 			elif idx == 4:
@@ -5241,9 +5241,22 @@ if report == 1:
 				factors += str(int(word)) + " × "
 			else:
 				factors += str(int(word))
-		numSqrt = "{0:^30}".format("{0}({1})".format(num,sqrt))+"{0:^15}{1:^10}{2:^15}{3:^10}{4:^15}{5:^10}{6:^15}{7:^10}".format(i1,inc1,i2,inc2,i3,inc3,i4,inc4)
+		numSqrt = "{0:^30}".format("{0}({1})".format(num,sqrt))+"{0:^15}{1:^10}{2:^15}{3:^10}{4:^15}{5:^10}{6:^15}{7:^10}".format(i1Sum,inc1,i2,inc2,i3,inc3,i4,inc4)
 		print("%s%s" % (numSqrt,factors),file=fsq)
 		lines += 1
 
 print("Processing complete.")
-
+#n * (n+k) * (n + 2*k) * (n+3*k) + k^4 
+#= n* (n+2*k) * (n+k)*(n+3*k) + k^4
+#= (n^2+2*k*n) * (n^2 + 4*k*n + 3*k^2) + k^4
+#= (n^2*n^2 + 2*k*n*n^2) + (4*k*n*n^2 + 4*k*n*2*k*n) + (3*k^2 * n^2 + 3*k^2 * 2*k*n) +k^4
+#= n^4      + 2*k*n^3    + 4*k*n^3    + 8*k^2*n^2    +  3*k^2*n^2   + 6*k^3*n        + k^4
+#= n^4      + 6*k*n^3                 + 11*k^2n^2                   + 6*k^3*n        + k^4
+#
+#(n*k + (n+k)^2)^2
+#=(n*k + n^2 + 2*k*n + k^2)^2
+#=(n*k + n^2 + 2*k*n + k^2) * (n*k + n^2 + 2*k*n + k^2)
+#= (n*k*n*k + n^2*n*k + 2*k*n*n*k + k^2*n*k) + (n*k*n^2 + n^2*n^2 + 2*k*n*n^2 + k^2*n^2) + (n*k*2*k*n + n^2*2*k*n + 2*k*n*2*k*n + k^2*2*k*n) + (n*k*k^2 + n^2*k^2 + 2*k*n*k^2) + (k^2*k^2)
+#= (k^2*n^2 + k*n^3 + 2*k^2*n^2 + k^3*n) + (k*n^3 + n^4 + 2*k*n^3 + k^2*n^2) + (2*k^2*n^2 + 2*k*n^3 + 4*k^2*n^2 + 2*k^3*n) + (k^3*n + k^2*n^2 + 2*k^3*n + k^4)
+#= n^4 + (k*n^3 + k*n^3 + 2*k*n^3 + 2*k*n^3) + (k^2n^2 + 2*k^2*n^2 + k^2*n^2 + 2*k^2*n^2 + 4*k^2*n^2 + k^2*n^2) + (k^3*n + 2*k^3*n + k^*n + 2*k^3*n) + k^4
+#= n^4 + 6*k*n^3 + 11*k^2n^2 + 6*k^3*n + k^4

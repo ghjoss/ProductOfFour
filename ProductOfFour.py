@@ -7,6 +7,7 @@ import sys
 import collections
 
 debug = 0
+bash = 1		# =0/apps is on windows drive F as accessed from win10  =1/app is on windows drive F as accessed from bash on win10
 if debug == 0:
 	testNode = ""
 	n = 5551 				# top of range, will actually iterate n - 1
@@ -5037,7 +5038,7 @@ factorsList = []			# list of the prime factors of the square roots
 
 
 if sheet == 1:				
-	headerCSV = "i,num,sq.Root,factor,factor,factor,factor,factor,factor,factor,factor,factor,factor,factor,factor,factor,"
+	headerCSV = "i,num,sq.Root"+",factor"*13
 
 if report == 1:
 	headerTXT = "{0:>8}{1:^30}num**0.5(factors)".format("i","num")
@@ -5051,7 +5052,10 @@ for increment in range(1,incMax):
 
 	if sheet == 1:
 		#open the report for output
-		fCSV = open('f:\\source\\PythonApps\\productOfFourSheet\\ProductOfFour_Increment_'+testNode+str(increment)+'.csv', 'w') # for running on desktop machine
+		if bash == 0:
+			fCSV = open('f:\\source\\PythonApps\\productOfFourSheet\\ProductOfFour_Increment_'+testNode+str(increment)+'.csv', 'w') # for running on desktop machine
+		else:
+			fCSV = open('/mnt/f/source/PythonApps/ProductOfFourSheet/ProductOfFour_Increment_'+testNode+str(increment)+'.csv', 'w')
 		print(headerCSV + '"' + header0 + '\n"' + header1,file=fCSV)
 		
 	if report == 1:
@@ -5059,7 +5063,10 @@ for increment in range(1,incMax):
 		maxRootFactor = 0
 		maxNum = 0
 
-		fTXT = open('f:\\source\\PythonApps\\ProductOfFourSheet\\ProductOfFour_Increment_'+testNode+str(increment)+'.txt', 'w') # for running on laptop machine
+		if bash == 0:
+			fTXT = open('f:\\source\\PythonApps\\ProductOfFourSheet\\ProductOfFour_Increment_'+testNode+str(increment)+'.txt', 'w') # for running on laptop machine
+		else:
+			fTXT = open('/mnt/f/source/PythonApps/ProductOfFourSheet/ProductOfFour_Increment_'+testNode+str(increment)+'.txt', 'w') # for running on laptop machine
 		
 
 	#loop through the first "n" integers, calculating the product of four consecutive
@@ -5134,6 +5141,7 @@ for increment in range(1,incMax):
 								maxNum = num
 								maxRootFactor = p
 							factorizationTestNum /= p
+							factorizatoinTestNum = int(factorizationTestNum)
 							if factorizationTestNum == 1:
 #								factors = factors + "," + str(p)
 								factorsList.append(p)
@@ -5147,7 +5155,16 @@ for increment in range(1,incMax):
 		if sheet == 1:
 			print(i,num,sqrtNum,*factorsList,sep=",",file=fCSV)
 		if report == 1:
-			print("{0:8d}{1:^30d}".format(i,num)+"{0:^d}({1})".format(sqrtNum,*factorsList),file=fTXT)
+			factors = ""
+			l = len(factorsList) - 1
+			if l == 0:
+				primeRoots += 1
+			for idx,word in enumerate(factorsList):
+				if idx < l:
+					factors += str(int(word)) + " × "
+				else:
+					factors += str(int(word))
+			print("{0:8d}{1:^30d}".format(i,num)+"{0:^d}({1})".format(sqrtNum,factors),file=fTXT)
 
 		if not (num in factorsDict):
 			factorsDict[num] = factorsList
@@ -5174,17 +5191,20 @@ print("Processing analysis of calculated squares...")
 osq = collections.OrderedDict(sorted(squaresDict.items()))
 
 if sheet == 1:		 
-	header = "Number,Root,"
-	header2 = "1st of four,Incr"
-	header = header + header2 +"," + header2 + "," + header2 + "," + header2 + ",factor,factor,factor,factor,factor,factor,factor,factor,factor,factor,factor,factor,factor"
-	count = 0
+	header = "Number,Root"
+	header2 = ",1st of four,Incr"*4
+	header = header + header2 + ",factor"*13
 	fileNo = 1
+	count=0
 	for k,v in osq.items():
 		count += 1
 		if count % 250000 == 1:
 			if count != 1:
 				fsq.close()
-			fsq = open("f:\\source\\PythonApps\\ProductOfFourSheet\\squares_"+testNode+str(fileNo)+".csv","w")
+			if bash == 0:
+				fsq = open("f:\\source\\PythonApps\\ProductOfFourSheet\\squares_"+testNode+str(fileNo)+".csv","w")
+			else:
+				fsq = open("/mnt/f/source/PythonApps/ProductOfFourSheet/squares_"+testNode+str(fileNo)+".csv","w")
 			print(header,file=fsq)
 			fileNo += 1
 		factorsList = factorsDict[k]
@@ -5194,11 +5214,14 @@ if sheet == 1:
 		print(*newlist,sep=",",file=fsq)
 	fsq.close()
 if report == 1:
-	fsq = open("f:\\source\\PythonApps\\ProductOfFourSheet\\squares.txt","w")
+	if bash == 0:
+		fsq = open("f:\\source\\PythonApps\\ProductOfFourSheet\\squares.txt","w")
+	else:
+		fsq = open("/mnt/f/source/PythonApps/ProductOfFourSheet/squares.txt","w")
 	lines = 0
 	header = "{0:^30}".format("Number(Root)")
 	header2 = "{0:^15}{1:^10}".format("1st of four","incr")
-	header = header + header2 + header2 + header2 + header2 + "Prime Factors"
+	header = header + header2 * 4 + "Prime Factors"
 	headerL = "-" * len(header)
 			  
 	for k,v in osq.items():
@@ -5246,6 +5269,8 @@ if report == 1:
 		lines += 1
 
 print("Processing complete.")
+
+
 #n * (n+k) * (n + 2*k) * (n+3*k) + k^4 
 #= n* (n+2*k) * (n+k)*(n+3*k) + k^4
 #= (n^2+2*k*n) * (n^2 + 4*k*n + 3*k^2) + k^4

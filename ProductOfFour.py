@@ -6,21 +6,28 @@
 import sys
 import collections
 
-debug = 0
-bash = 1		# =0/apps is on windows drive F as accessed from win10  =1/app is on windows drive F as accessed from bash on win10
-if debug == 0:
-	testNode = ""
-	n = 5551 				# top of range, will actually iterate n - 1
-	incMax = 31
+debug = False
+bash = True		# =False/apps is on windows drive F as accessed from win10  =True/app is on windows drive F as accessed from bash on win10
+if bash:
+	dirCSV = "/mnt/f/source/PythonApps/ProductOfFourSheet/"
+	dirTXT = "/mnt/f/source/PythonApps/ProductOfFourSheet/"
 else:
+	dirCSV = "f:\\source\\PythonApps\\ProductOfFourSheet\\"
+	dirTXT = "f:\\source\\PythonApps\\ProductOfFourSheet\\"
+
+if debug:
 	testNode="TEST_"
 	n = 500
 	incMax = 2
+else:
+	testNode = ""
+	n = 5551 				# top of range, will actually iterate n - 1
+	incMax = 31
 
-sheet = 1					# 1=generate spreadsheet data, 0=no spreadsheet data
-report = 1					# 1=generate text report, 0=no text report
+generateSheet = True					# True=generate spreadsheet data, False=no spreadsheet data
+generateReport = True					# True=generate text report, False=no text report
 
-if sheet == 0 and report == 0:
+if not generateSheet and not generateReport:
 	print("Must run to generate either sheet or text report or both, but not neither.")
 	exit()
 
@@ -5037,10 +5044,10 @@ factorsDict = {}			# dictionary of lists of the prime factors of the square root
 factorsList = []			# list of the prime factors of the square roots
 
 
-if sheet == 1:				
+if generateSheet:				
 	headerCSV = "i,num,sq.Root"+",factor"*13
 
-if report == 1:
+if generateReport:
 	headerTXT = "{0:>8}{1:^30}num**0.5(factors)".format("i","num")
 	headerLTXT = "-" * 72
 					
@@ -5050,24 +5057,17 @@ for increment in range(1,incMax):
 	header0 = "increment == {0:d}".format(increment)
 	header1 = "num == (i × (i+{0:d}) × (i+{1:d}) × (i+{2:d}) + {3:d})".format(increment,2*increment,3*increment,inc4) + " -or-  num == (i × {0:d} + (i + {0:d})²)²".format(increment)
 
-	if sheet == 1:
+	if generateSheet:
 		#open the report for output
-		if bash == 0:
-			fCSV = open('f:\\source\\PythonApps\\productOfFourSheet\\ProductOfFour_Increment_'+testNode+str(increment)+'.csv', 'w') # for running on desktop machine
-		else:
-			fCSV = open('/mnt/f/source/PythonApps/ProductOfFourSheet/ProductOfFour_Increment_'+testNode+str(increment)+'.csv', 'w')
+		fCSV = open(dirCSV + 'ProductOfFour_Increment_'+testNode+str(increment)+'.csv', 'w')
 		print(headerCSV + '"' + header0 + '\n"' + header1,file=fCSV)
 		
-	if report == 1:
+	if generateReport:
 		primeRoots = 0
 		maxRootFactor = 0
 		maxNum = 0
 
-		if bash == 0:
-			fTXT = open('f:\\source\\PythonApps\\ProductOfFourSheet\\ProductOfFour_Increment_'+testNode+str(increment)+'.txt', 'w') # for running on laptop machine
-		else:
-			fTXT = open('/mnt/f/source/PythonApps/ProductOfFourSheet/ProductOfFour_Increment_'+testNode+str(increment)+'.txt', 'w') # for running on laptop machine
-		
+		fTXT = open(dirTXT + 'ProductOfFour_Increment_'+testNode+str(increment)+'.txt', 'w') # for running on laptop machine
 
 	#loop through the first "n" integers, calculating the product of four consecutive
 	#numbers, starting at the current index. Note that observation and analysis has
@@ -5077,7 +5077,7 @@ for increment in range(1,incMax):
 	for i in range(1,n):
 		factorsList = []
 
-		if report == 1:	
+		if generateReport:	
 			if i % 45 == 1:
 					if i > 1:
 						print("",file=fTXT)
@@ -5091,8 +5091,7 @@ for increment in range(1,incMax):
 		#factorizationTestNum = sqrtNum = num ** 0.5
 		# alternative, equivalent values
 		i1Sum = i + increment
-		i1Prod = i*increment
-		factorizationTestNum = sqrtNum = i1Prod + i1Sum * i1Sum  #factorizationTestNum = sqrtNum = i*increment + (i+increment)²
+		factorizationTestNum = sqrtNum = i*increment + i1Sum * i1Sum  #factorizationTestNum = sqrtNum = i*increment + (i+increment)²
 		#num = (iProd + i1Sum**2)**2
 		num = sqrtNum * sqrtNum
 		if num in squaresDict: # have we already seen this number when processing a previous arithmetic sequence?
@@ -5115,7 +5114,7 @@ for increment in range(1,incMax):
 			if sqrtNum in primesDict:	# is the current square root one of the first 50K primes in the primes list
 				#yes, no need to factor further
 				factorsList.append(sqrtNum)
-				if report == 1 and sqrtNum > maxRootFactor:
+				if generateReport and sqrtNum > maxRootFactor:
 					maxNum = num
 					maxRootFactor = sqrtNum
 			else:
@@ -5131,7 +5130,7 @@ for increment in range(1,incMax):
 					# 50,000 primes.				
 					if p >= sqrtFactorizationTestNum or factorizationTestNum in primesDict:
 						factorsList.append(factorizationTestNum)
-						if report == 1 and factorizationTestNum >= maxRootFactor:
+						if generateReport and factorizationTestNum >= maxRootFactor:
 							maxNum = num
 							maxRootFactor = factorizationTestNum
 						break # while j < len(primes) and breakJ == 0
@@ -5152,9 +5151,9 @@ for increment in range(1,incMax):
 						sqrtFactorizationTestNum = factorizationTestNum ** 0.5
 						j = j + 1
 				#end 'while j < len(primes) and breakJ == 0
-		if sheet == 1:
+		if generateSheet:
 			print(i,num,sqrtNum,*factorsList,sep=",",file=fCSV)
-		if report == 1:
+		if generateReport:
 			factors = ""
 			l = len(factorsList) - 1
 			if l == 0:
@@ -5175,14 +5174,14 @@ for increment in range(1,incMax):
 			sys.stdout.flush()
 			if i%2500 == 1:
 				print("%d products analyzed" % (i))
-	if report == 1:
+	if generateReport:
 		print("There are %d prime square roots out of %d calculations." % (primeRoots,n - 1),file=fTXT)
 		print("Maximum prime factor: %d (at test for %d)" % (maxRootFactor,maxNum),file=fTXT)
 
 	# end "for in in range(1,n)
-	if sheet == 1:
+	if generateSheet:
 		fCSV.close()
-	if report == 1:
+	if generateReport:
 		fTXT.close()
 	print("Processing complete for increment %d" % (increment))
 #end 'for increment in range(1,...'
@@ -5190,7 +5189,7 @@ for increment in range(1,incMax):
 print("Processing analysis of calculated squares...")
 osq = collections.OrderedDict(sorted(squaresDict.items()))
 
-if sheet == 1:		 
+if generateSheet:		 
 	header = "Number,Root"
 	header2 = ",1st of four,Incr"*4
 	header = header + header2 + ",factor"*13
@@ -5200,24 +5199,18 @@ if sheet == 1:
 		count += 1
 		if count % 250000 == 1:
 			if count != 1:
-				fsq.close()
-			if bash == 0:
-				fsq = open("f:\\source\\PythonApps\\ProductOfFourSheet\\squares_"+testNode+str(fileNo)+".csv","w")
-			else:
-				fsq = open("/mnt/f/source/PythonApps/ProductOfFourSheet/squares_"+testNode+str(fileNo)+".csv","w")
-			print(header,file=fsq)
+				fsqCSV.close()
+			fsqCSV = open(dirCSV + "squares_"+testNode+str(fileNo)+".csv","w")
+			print(header,file=fsqCSV)
 			fileNo += 1
 		factorsList = factorsDict[k]
 		for i in range(1,10-len(v)+1):
 			v.append("")
 		newlist = v + factorsList
-		print(*newlist,sep=",",file=fsq)
-	fsq.close()
-if report == 1:
-	if bash == 0:
-		fsq = open("f:\\source\\PythonApps\\ProductOfFourSheet\\squares.txt","w")
-	else:
-		fsq = open("/mnt/f/source/PythonApps/ProductOfFourSheet/squares.txt","w")
+		print(*newlist,sep=",",file=fsqCSV)
+	fsqCSV.close()
+if generateReport:
+	fsqTXT = open(dirTXT + "squares.txt","w")
 	lines = 0
 	header = "{0:^30}".format("Number(Root)")
 	header2 = "{0:^15}{1:^10}".format("1st of four","incr")
@@ -5228,10 +5221,10 @@ if report == 1:
 			   
 		if lines % 45 == 0:
 			if lines != 0:
-				print("",file=fsq)
-			print(headerL,file=fsq)
-			print(header,file=fsq)
-			print(headerL,file=fsq)
+				print("",file=fsqTXT)
+			print(headerL,file=fsqTXT)
+			print(header,file=fsqTXT)
+			print(headerL,file=fsqTXT)
 		for i in range(1,10-len(v)+1):
 			v.append("")
 		for idx,word in enumerate(v):
@@ -5265,7 +5258,7 @@ if report == 1:
 			else:
 				factors += str(int(word))
 		numSqrt = "{0:^30}".format("{0}({1})".format(num,sqrt))+"{0:^15}{1:^10}{2:^15}{3:^10}{4:^15}{5:^10}{6:^15}{7:^10}".format(i1Sum,inc1,i2,inc2,i3,inc3,i4,inc4)
-		print("%s%s" % (numSqrt,factors),file=fsq)
+		print("%s%s" % (numSqrt,factors),file=fsqTXT)
 		lines += 1
 
 print("Processing complete.")

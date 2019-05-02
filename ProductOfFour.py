@@ -5,6 +5,10 @@
 #
 import sys
 import collections
+import time
+
+splits = {}
+splits[0] = time.time()
 
 debug = False
 bash = True		# =False/apps is on windows drive F as accessed from win10  =True/app is on windows drive F as accessed from bash on win10
@@ -5183,6 +5187,8 @@ for increment in range(1,incMax):
 		fCSV.close()
 	if generateReport:
 		fTXT.close()
+	ct = len(splits)
+	splits[ct] = time.time()
 	print("Processing complete for increment %d" % (increment))
 #end 'for increment in range(1,...'
 
@@ -5260,7 +5266,15 @@ if generateReport:
 		numSqrt = "{0:^30}".format("{0}({1})".format(num,sqrt))+"{0:^15}{1:^10}{2:^15}{3:^10}{4:^15}{5:^10}{6:^15}{7:^10}".format(i1Sum,inc1,i2,inc2,i3,inc3,i4,inc4)
 		print("%s%s" % (numSqrt,factors),file=fsqTXT)
 		lines += 1
+ct = len(splits)
+splits[ct] = time.time()
 
+for idx in range(0,ct+1):
+	tm = splits[idx]
+	if idx != 0:
+		print("%3d %4.3f Duration %4.3f" % (idx,tm,tm - baseTime))
+	baseTime = tm
+print("Total Duration %4.3f" % (splits[ct] - splits[0]))
 print("Processing complete.")
 
 

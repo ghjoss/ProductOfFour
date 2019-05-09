@@ -5177,10 +5177,10 @@ for increment in range(1,incMax):
 			sys.stdout.write(".")
 			sys.stdout.flush()
 			if i%2500 == 1:
-				print("%d products analyzed" % (i))
+				print("{0:d} products analyzed".format(i))
 	if generateReport:
-		print("There are %d prime square roots out of %d calculations." % (primeRoots,n - 1),file=fTXT)
-		print("Maximum prime factor: %d (at test for %d)" % (maxRootFactor,maxNum),file=fTXT)
+		print("There are {0:d} prime square roots out of {1:d} calculations.".format(primeRoots,n - 1),file=fTXT)
+		print("Maximum prime factor: {0:d} (at test for {1:d})".format(maxRootFactor,maxNum),file=fTXT)
 
 	# end "for in in range(1,n)
 	if generateSheet:
@@ -5189,7 +5189,7 @@ for increment in range(1,incMax):
 		fTXT.close()
 	ct = len(splits)
 	splits[ct] = time.time()
-	print("Processing complete for increment %d" % (increment))
+	print("Processing complete for increment {inc:d}".format(inc=increment))
 #end 'for increment in range(1,...'
 
 print("Processing analysis of calculated squares...")
@@ -5264,7 +5264,7 @@ if generateReport:
 			else:
 				factors += str(int(word))
 		numSqrt = "{0:^30}".format("{0}({1})".format(num,sqrt))+"{0:^15}{1:^10}{2:^15}{3:^10}{4:^15}{5:^10}{6:^15}{7:^10}".format(i1Sum,inc1,i2,inc2,i3,inc3,i4,inc4)
-		print("%s%s" % (numSqrt,factors),file=fsqTXT)
+		print("{0:s}{1:s}".format(numSqrt,factors),file=fsqTXT)
 		lines += 1
 ct = len(splits)
 splits[ct] = time.time()
@@ -5272,9 +5272,9 @@ splits[ct] = time.time()
 for idx in range(0,ct+1):
 	tm = splits[idx]
 	if idx != 0:
-		print("%3d %4.3f Duration %4.3f" % (idx,tm,tm - baseTime))
+		print("{interval:3d} {time:4.3f} Duration {duration:4.3f}".format(interval=idx,time=tm,duration=tm - baseTime))
 	baseTime = tm
-print("Total Duration %4.3f" % (splits[ct] - splits[0]))
+print("Total Duration {duration:4.3f}".format(duration=splits[ct] - splits[0]))
 print("Processing complete.")
 
 

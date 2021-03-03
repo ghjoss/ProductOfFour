@@ -8,7 +8,7 @@ import re
 #	True - Linux file system paths
 #	False - Windows file system paths
 #
-bash = False
+bash = True
 # fileCount:
 #   Number of files that were output by ProductOfFour.py.
 #	File names are in the format <path>ProductOfFour_Increment_n, 
@@ -23,24 +23,28 @@ fileCount = 1200
 if bash:
 	path = "/mnt/f/source/PythonApps/ProductOfFourSheet"
 	filePath = "/mnt/f/source/PythonApps/ProductOfFourSheet/Output/"
+	multSign = "x"
 else:
 	path = "F:\\Source\\PythonApps\\ProductOfFourSheet"
 	filePath = "F:\\Source\\PythonApps\\ProductOfFourSheet\\Output\\"
+	multSign = "\xD7"
 
 sys.path.append(path)
 import _50KPrimes
 
 
 foundDict = {}
-r = re.compile(".+\((?P<Factors>(?:\d+\s*[\u00D7]?\s*)+)\)")
+byFile = [dict() for x in range(fileCount+1)]
 
+r = re.compile(".+\((?P<Factors>(?:\d+\s*[\u00D7]?\s*)+)\)")
 for w in _50KPrimes.primes:
 	foundDict[str(w)] = False
 
-fOut = open(filePath + "PrimesInFiles(py).txt", "w")
+fOut = open(filePath + "PrimesInFiles.txt", "w")
 
 for fileNo in range(1,fileCount + 1):
 	f = filePath + "ProductOfFour_Increment_" + str(fileNo) + ".txt"
+	byFileCt = 0
 	print("processing " + f + "...")
 
 	print(f,file=fOut)
@@ -62,15 +66,17 @@ for fileNo in range(1,fileCount + 1):
 		if line.find("There are") >= 0:
 			skip = -1
 			break # no more relevant lines in fIn
-		m = r.search(line)
+		m = r.match(line)
 		if m != None:
 			factors = m.group("Factors")
-			factors = factors.replace("\xD7"," ")
+			factors = factors.replace(multSign," ")
 			wordList = re.sub("[^\w]"," ",factors).split()
 			for pr in wordList:
 				if pr in foundDict:
 					if not foundDict[pr]:
 						foundDict[pr] = True
+						byFileCt += 1
+						byFile[fileNo][byFileCt] = str(pr).rjust(6,"0") + "(@" + str(currentLine) + ")"
 						primeLineCt += 1
 						primeLine = primeLine + (str(pr) + "(@" + str(currentLine) + ")").ljust(15)
 						if primeLineCt == 7:
@@ -86,6 +92,41 @@ for fileNo in range(1,fileCount + 1):
 			print("  " + primeLine,file=fOut)
 			primeLine = ""
 fOut.close()
+
+
+fOut = open(filePath + "PrimesInFilesSorted.txt)","w")
+for fileNo in range(1, fileCount + 1):
+	if fileNo > 1:
+		print("\n",file=fOut)
+	print(filePath + "ProductOfFour_Increment_" + str(fileNo) + ".txt",file=fOut)
+	byFileKeysS = sorted(byFile[fileNo],key=byFile[fileNo].get)
+	byFileS = {}
+	byFileSKey = 0
+	for w in byFileKeysS:
+		byFileSKey += 1
+		byFileS[byFileSKey] = (byFile[fileNo])[w]
+	primeLineCt = 0
+	primeLine = ""
+	for w in byFileS:
+		prStr = byFileS[w]
+		t = prStr.find("(@")
+		u = prStr.find(")")
+		pr = int(prStr[0:t])
+		currentLine = int(prStr[t+2:u])
+		primeLine = primeLine + (str(pr) + "(@" + str(currentLine) + ")").ljust(15)
+		primeLineCt += 1
+		if primeLineCt == 7:
+			primeLineCt = 0
+			print("  " + primeLine,file=fOut)
+			primeLine = ""
+
+if primeLineCt > 0:
+	if primeLineCt > 0:
+		primeLineCt = 0
+		print("  " + primeLine,file=fOut)
+		primeLine = ""
+fOut.close()
+
 
 
 

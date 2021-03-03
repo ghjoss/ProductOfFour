@@ -130,6 +130,8 @@ for increment in range(1,incMax):
 				breakJ = 0	# controls whether to leave the "while j <...." loop below
 				j = 0		# loop index for the list[] of the first 50000 primes
 				sqrtFactorizationTestNum = sqrtNum ** 0.5	#max value to test
+				factoring7 = True
+				factoring13 = True
 				while j < len(_50KPrimes.primes) and breakJ == 0:
 					p = _50KPrimes.primes[j]
 					# There is no need to continue trying to find factors of the current
@@ -137,6 +139,13 @@ for increment in range(1,incMax):
 					# root of the test number or if the test number is in the table of 
 					# 50,000 primes.				
 					if p > sqrtFactorizationTestNum or factorizationTestNum in primesDict:
+						if (factoring13 and factorizationTestNum == 13) or (factoring7 and factorizationTestNum == 7):
+							print("n={0:d} ".format(i) + "increment={0:d}".format(increment) + "factor={0:d}".format(factorizationTestNum))
+							if factorizationTestNum == 13:
+								factoring13 = False
+							else:
+								factoring7 = False
+
 						factorsList.append(factorizationTestNum)
 						if generateReport and factorizationTestNum >= maxRootFactor:
 							maxNum = num
@@ -151,10 +160,22 @@ for increment in range(1,incMax):
 							factorizatoinTestNum = int(factorizationTestNum)
 							if factorizationTestNum == 1:
 #								factors = factors + "," + str(p)
+								if (factoring13 and p == 13) or (factoring7 and p == 7):
+									print("n={0:d} ".format(i) + "increment={0:d}".format(increment) + "factor={0:d}".format(p))
+									if p == 13:
+										factoring13 = False
+									else:
+										factoring7 = False
 								factorsList.append(p)
 								breakJ = 1
 								break # while factorizationTestNum %p == 0
 							else: 
+								if (factoring13 and p == 13) or (factoring7 and p == 7):
+									print("n={0:d} ".format(i) + "increment={0:d}".format(increment) + "factor={0:d}".format(p))
+									if p == 13:
+										factoring13 = False
+									else:
+										factoring7 = False
 								factorsList.append(p)
 						sqrtFactorizationTestNum = factorizationTestNum ** 0.5
 						j = j + 1

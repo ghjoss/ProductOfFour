@@ -2,15 +2,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>0a408c82-bd9a-46b3-8043-2ca2fb40851a</ProjectGuid>
+    <ProjectGuid>8c26bcce-f193-4c48-8c8c-e47bb411cd08</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>ProductOfFour.py</StartupFile>
+    <StartupFile>Check.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
-    <Name>ProductOfFour</Name>
-    <RootNamespace>ProductOfFour</RootNamespace>
+    <Name>Check</Name>
+    <RootNamespace>Check</RootNamespace>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -21,10 +21,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="ProductOfFour.py" />
-    <Compile Include="_50KPrimes.py">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="Check.py" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

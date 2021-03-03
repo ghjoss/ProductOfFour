@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import sys
 import time
 
@@ -36,7 +37,7 @@ for i in range (0,funcCount):
 	minVals.append(99.9)
 	maxVals.append(0.0)
 
-iterations = 1000
+iterations = 100
 f = open("./test.txt","w")
 for test in range (0,funcCount):
 	print("Testing {0:d}: {1:s}".format(test,functionsStr[test]),file=f)
@@ -44,14 +45,14 @@ for test in range (0,funcCount):
 
 	for count in range (0,iterations):
 		testStart = time.time()
-		for n in range (1,5301):
+		for n in range (1,5001):
 			for i in range (1,31):
 				num = functions[test](n,i)
 		duration = time.time() - testStart
 		maxVals[test] = max(maxVals[test],duration)
 		minVals[test] = min(minVals[test],duration)
 		avgs[test] = avgs[test] + duration
-#		print("For test {test:d} the duration was {duration:4.3f}".format(test=test,duration=duration))
+#	print("For test {test:d} the duration was {duration:4.3f}".format(test=test,duration=duration))
 print("\n ---",file=f)
 print("\n ---")
 for test in range (0,funcCount):

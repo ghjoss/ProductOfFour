@@ -7,14 +7,28 @@ import sys
 import collections
 import time
 
+#Prime lists
 sys.path.append('.')
-import _50KPrimes
+import _100KPrimes #100,000 prime numbers in an array named "primes"
+# maxPrime: in the array of primes, this is the offset of the last
+# prime to process.
+maxPrime = 100000 #50000
 
 splits = {}
 splits[0] = time.time()
 
 debug = False
-bash = True		# =False/apps is on windows drive F as accessed from win10  =True/app is on windows drive F as accessed from bash on win10
+lav = len(sys.argv)
+if lav > 1:
+	arg1 = sys.argv[1]
+else:
+	arg1 = "W"
+if arg1.startswith("B"):
+	bash = True
+else:
+	bash = False
+
+# bash=False apps is on windows drive F as accessed from win10  =True/app is on windows drive F as accessed from bash on win10
 # directory names must end with a directory specification separator (/ for linux, \ for ms Windows). Otherwise the final node will
 # be treates as a file name prefix.
 if bash:
@@ -27,7 +41,7 @@ else:
 # for debugging, work with a smaller set of numbers and increments
 if debug:
 	testNode="TEST_"
-	n = 500
+	n = 50
 	incMax = 2
 else:
 	testNode = ""
@@ -43,7 +57,8 @@ if not generateSheet and not generateReport:
 
 # add the primes as keys to a dictionary "primeDict"
 primesDict = {} # add the p
-for w in _50KPrimes.primes:
+
+for w in _100KPrimes.primes:
 	primesDict[w] = True
 
 squaresDict = {}			# dictionary of lists of the generated squares and square roots. Key = square number
@@ -133,12 +148,12 @@ for increment in range(1,incMax):
 				breakJ = 0	# controls whether to leave the "while j <...." loop below
 				j = 0		# loop index for the list[] of the first 50000 primes
 				sqrtFactorizationTestNum = sqrtNum ** 0.5	#max value to test
-				while j < len(_50KPrimes.primes) and breakJ == 0:
-					p = _50KPrimes.primes[j]
+				while j < maxPrime and breakJ == 0:
+					p = _100KPrimes.primes[j]
 					# There is no need to continue trying to find factors of the current
 					# test number if we have not found one yet and the next prime > square
 					# root of the test number or if the test number is in the table of 
-					# 50,000 primes.				
+					# primes.				
 					if p > sqrtFactorizationTestNum or factorizationTestNum in primesDict:
 						factorsList.append(factorizationTestNum)
 						if generateReport and factorizationTestNum >= maxRootFactor:
@@ -171,7 +186,7 @@ for increment in range(1,incMax):
 				primeRoots += 1
 			for idx,word in enumerate(factorsList):
 				if idx < l:
-					factors += str(int(word)) + " x " if bash else " × "
+					factors += str(int(word)) + (" x " if bash else " × ")
 				else:
 					factors += str(int(word))
 			print("{0:8d}{1:^30d}".format(i,num)+"{0:^d}({1})".format(sqrtNum,factors),file=fTXT)

@@ -8,16 +8,33 @@ import re
 #	True - Linux file system paths
 #	False - Windows file system paths
 #
-bash = True
+if len(sys.argv) > 1:
+	arg1 = sys.argv[1].upper()
+else:
+	arg1 = "W"
+
+if arg1.startswith("B"):
+	bash = True
+else:
+	bash = False
+
 # fileCount:
 #   Number of files that were output by ProductOfFour.py.
 #	File names are in the format <path>ProductOfFour_Increment_n, 
 #	where n ranges from 1 to fileCount.
-fileCount = 1200
+if len(sys.argv) > 2:
+	arg2 = sys.argv[2]
+else:
+	arg2 = 1200
+
+if str(arg2).isnumeric():
+	fileCount = arg2
+else:
+	fileCount = 1200
 
 # path:
 # if bash == False:
-#	F:\Source\PythonApps\ProductOfFourSheet\_50KPrimes.py
+#	F:\Source\PythonApps\ProductOfFourSheet
 # if bash == True:
 #	/mnt/f/Source/PythonApps/ProductofFourSheet"
 if bash:
@@ -30,14 +47,17 @@ else:
 	multSign = "\xD7"
 
 sys.path.append(path)
-import _50KPrimes
+import _100KPrimes
 
 
 foundDict = {}
 byFile = [dict() for x in range(fileCount+1)]
 
-r = re.compile(".+\((?P<Factors>(?:\d+\s*[\u00D7]?\s*)+)\)")
-for w in _50KPrimes.primes:
+if bash:
+	r = re.compile(".+\((?P<Factors>(?:\d+\s*[x]?\s*)+)\)")
+else:
+	r = re.compile(".+\((?P<Factors>(?:\d+\s*[\u00D7]?\s*)+)\)")
+for w in _100KPrimes.primes:
 	foundDict[str(w)] = False
 
 fOut = open(filePath + "PrimesInFiles.txt", "w")
@@ -94,7 +114,7 @@ for fileNo in range(1,fileCount + 1):
 fOut.close()
 
 
-fOut = open(filePath + "PrimesInFilesSorted.txt)","w")
+fOut = open(filePath + "PrimesInFilesSorted.txt","w")
 for fileNo in range(1, fileCount + 1):
 	if fileNo > 1:
 		print("\n",file=fOut)

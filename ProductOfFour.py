@@ -1,7 +1,9 @@
 #
-# The product of four consecutive numbers + 1 is always an integer squared.
-# Calculate the first n products +1, their square roots and the factors of those
-# square roots. Print out the results.
+# The product of four integers in a consecutive aritmetic sequence added to the increment integer value
+# raided to the fourth power is always a squared integer value.
+#
+# This program computes and reports these integer sequences up to a maximum user specified increment across
+# a range of sequence value, also user specified.  See incrementMax and intMax below.
 #
 import sys
 import collections
@@ -28,25 +30,25 @@ if arg1.startswith("B"):
 else:
 	bash = False
 
-# bash=False apps is on windows drive F as accessed from win10  =True/app is on windows drive F as accessed from bash on win10
+# bash=False apps is on windows drive D as accessed from win10  =True/app is on windows drive F as accessed from bash on win10
 # directory names must end with a directory specification separator (/ for linux, \ for ms Windows). Otherwise the final node will
 # be treates as a file name prefix.
 if bash:
-	dirCSV = "/mnt/f/source/PythonApps/ProductOfFourSheet/Output/"
-	dirTXT = "/mnt/f/source/PythonApps/ProductOfFourSheet/Output/"
+	dirCSV = "/mnt/d/source/PythonApps/ProductOfFourSheet/Output/"
+	dirTXT = "/mnt/d/source/PythonApps/ProductOfFourSheet/Output/"
 else:
-	dirCSV = "f:\\source\\PythonApps\\ProductOfFourSheet\\Output\\"
-	dirTXT = "f:\\source\\PythonApps\\ProductOfFourSheet\\Output\\"
+	dirCSV = "d:\\source\\PythonApps\\ProductOfFourSheet\\Output\\"
+	dirTXT = "d:\\source\\PythonApps\\ProductOfFourSheet\\Output\\"
 
-# for debugging, work with a smaller set of numbers and increments
+# for debugging, work with a smaller set of integers and increments
 if debug:
 	testNode="TEST_"
-	n = 50
-	incMax = 2
+	intMax = 51
+	incrementMax = 21
 else:
 	testNode = ""
-	n = 5551 				# top of range, will actually iterate n - 1
-	incMax = 1201
+	intMax = 5551 				# top of range, will actually iterate n - 1
+	incrementMax = 1201
 
 generateSheet = True					# True=generate spreadsheet data, False=no spreadsheet data
 generateReport = True					# True=generate text report, False=no text report
@@ -74,18 +76,20 @@ if generateReport:
 	headerTXT = "{0:>8}{1:^30}num**0.5(factors)".format("i","num")
 	headerLTXT = "-" * 72
 					
-for increment in range(1,incMax):
+for increment in range(1,incrementMax):
 	inc4 = increment ** 4
+	sqrtModList = []	# list of the first <increment> values of <increment> mod(square-root-of calculated integer)
+	numModList = []		# list of the first <increment> values of <increment> mod(calculated integer)
 
 	header0 = "increment == {0:d}".format(increment)
 	if bash:
 		header1 = "num == (i x (i+{0:d}) x (i+{1:d}) x (i+{2:d}) + {3:d})".format(increment,2*increment,3*increment,inc4) + " -or-  num == (i x {0:d} + (i + {0:d})²)²".format(increment)
 	else:
-		header1 = "num == (i × (i+{0:d}) × (i+{1:d}) × (i+{2:d}) + {3:d})".format(increment,2*increment,3*increment,inc4) + " -or-  num == (i × {0:d} + (i + {0:d})²)²".format(increment)
+		header1 = "num == (i x (i+{0:d}) x (i+{1:d}) x (i+{2:d}) + {3:d})".format(increment,2*increment,3*increment,inc4) + " -or-  num == (i x {0:d} + (i + {0:d})²)²".format(increment)
 
 	if generateSheet:
 		#open the report for output
-		fCSV = open(dirCSV + 'ProductOfFour_Increment_'+testNode+str(increment)+'.csv', 'w')
+		fCSV = open(dirCSV + 'Inc_'+testNode+str(increment)+'.csv', 'w')
 		print(headerCSV + header0 + '\n' + header1,file=fCSV)
 		
 	if generateReport:
@@ -93,16 +97,14 @@ for increment in range(1,incMax):
 		maxRootFactor = 0
 		maxNum = 0
 
-		fTXT = open(dirTXT + 'ProductOfFour_Increment_'+testNode+str(increment)+'.txt', 'w') # for running on laptop machine
+		fTXT = open(dirTXT + 'Inc_'+testNode+str(increment)+'.txt', 'w') # for running on laptop machine
 
-	#loop through the first "n" integers, calculating the product of four consecutive
-	#numbers, starting at the current index. Note that observation and analysis has
-	#shown that the square root of the product for the current index (== i) can
-	#be calculated as the sum: i + (i+1)**2. This is probably faster than doing the 
-	#product and then taking the square root.
-	for i in range(1,n):
+	#loop through the first "intMax" integers, calculating the product of four integers
+	# in an arithmetic sequencce separated by the current increment
+	#Note that analysis has shown that the square root of the product for the current index (== i) can
+	#be calculated as the sum: i + (i+1)**2. This is probably faster than doing the product and then taking the square root.
+	for i in range(1,intMax):
 		factorsList = []
-
 		if generateReport:	
 			if i % 45 == 1:
 					if i > 1:
@@ -120,6 +122,11 @@ for increment in range(1,incMax):
 		factorizationTestNum = sqrtNum = i*increment + i1Sum * i1Sum  #factorizationTestNum = sqrtNum = i*increment + (i+increment)²
 		#num = (iProd + i1Sum**2)**2
 		num = sqrtNum * sqrtNum
+		# calculate the modulo values starting with increment = 2.
+		if i <= increment and increment > 1:
+			sqrtModList.append(sqrtNum % increment)
+			numModList.append(num % increment)
+
 		if num in squaresDict: # have we already seen this number when processing a previous arithmetic sequence?
 			#yes, append the current value of i and the increment to the list entry for this number
 			l = squaresDict[num]	#get the list
@@ -177,8 +184,10 @@ for increment in range(1,incMax):
 						sqrtFactorizationTestNum = factorizationTestNum ** 0.5
 						j = j + 1
 				#end 'while j < len(primes) and breakJ == 0
+
 		if generateSheet:
 			print(i,num,sqrtNum,*factorsList,sep=",",file=fCSV)
+
 		if generateReport:
 			factors = ""
 			l = len(factorsList) - 1
@@ -186,7 +195,7 @@ for increment in range(1,incMax):
 				primeRoots += 1
 			for idx,word in enumerate(factorsList):
 				if idx < l:
-					factors += str(int(word)) + (" x " if bash else " × ")
+					factors += str(int(word)) + " x "
 				else:
 					factors += str(int(word))
 			print("{0:8d}{1:^30d}".format(i,num)+"{0:^d}({1})".format(sqrtNum,factors),file=fTXT)
@@ -200,9 +209,73 @@ for increment in range(1,incMax):
 			sys.stdout.flush()
 			if i%2500 == 1:
 				print("{0:d} products analyzed".format(i))
+
 	if generateReport:
-		print("There are {0:d} prime square roots out of {1:d} calculations.".format(primeRoots,n - 1),file=fTXT)
+		print("There are {0:d} prime square roots out of {1:d} calculations.".format(primeRoots,intMax - 1),file=fTXT)
 		print("Maximum prime factor: {0:d} (at test for {1:d})".format(maxRootFactor,maxNum),file=fTXT)
+
+		if increment % 2 == 1:
+			moduloMidpoint = (increment -1) / 2
+			incrementIsOdd = True
+		else:
+		   moduloMidpoint = increment / 2
+		   incrementIsOdd = False
+
+		moduloPrint = ""
+		moduloPrintHeader = "Calculated number modulo " + str(increment) + " cycle: "
+		moduloPrintHeaderLen = len(moduloPrintHeader)
+		offset = 0
+		rightAst = ""
+		for m in numModList:
+			offset += 1
+			if offset == moduloMidpoint:
+				if incrementIsOdd:
+					strM = ('* ' + str(m)).rjust(11)
+					rightAst = " *"
+				else:
+					strM = ("* " + str(m) + " *").rjust(11)
+			else:
+				strM = (str(m) + rightAst).rjust(11)
+				rightAst = ""
+
+			moduloPrint = moduloPrint + strM
+			if len(moduloPrint) >= 110 and increment != 1:
+				print(moduloPrintHeader + moduloPrint,file=fTXT)
+				moduloPrintHeader = " " * moduloPrintHeaderLen
+				moduloPrint = ""
+
+		if moduloPrint != "" and increment != 1:
+			print(moduloPrintHeader + moduloPrint,file=fTXT)
+
+		offset = 0
+		rightAst = ""
+		moduloPrint = ""
+		# pad print header to be as long as the prior header
+		moduloPrintHeader = ("Square root modulo " + str(increment) + " cycle: ").ljust(moduloPrintHeaderLen)
+
+		offset = 0
+		rightAst = ""
+		for m in sqrtModList:
+			offset += 1
+			if offset == moduloMidpoint:
+				if incrementIsOdd:
+					strM = ('* ' + str(m)).rjust(11)
+					rightAst = " *"
+				else:
+					strM = ("* " + str(m) + " *").rjust(11)
+			else:
+				strM = (str(m) + rightAst).rjust(11)
+				rightAst = ""
+
+			moduloPrint = moduloPrint + strM
+			if len(moduloPrint) >= 110 and increment != 1:
+				print(moduloPrintHeader + moduloPrint,file=fTXT)
+				moduloPrintHeader = " " * moduloPrintHeaderLen
+				moduloPrint = ""
+
+		if moduloPrint != "" and increment != 1:
+			print(moduloPrintHeader + moduloPrint,file=fTXT)
+
 
 	# end "for in in range(1,n)
 	if generateSheet:
@@ -282,7 +355,7 @@ if generateReport:
 		l = len(factorsList) - 1
 		for idx,word in enumerate(factorsList):
 			if idx < l:
-				factors += str(int(word)) + " x " if bash else " × "
+				factors += str(int(word)) + " x "
 			else:
 				factors += str(int(word))
 		numSqrt = "{0:^30}".format("{0}({1})".format(num,sqrt))+"{0:^15}{1:^10}{2:^15}{3:^10}{4:^15}{5:^10}{6:^15}{7:^10}".format(i1Sum,inc1,i2,inc2,i3,inc3,i4,inc4)
@@ -314,3 +387,10 @@ print("Processing complete.")
 #= (k^2*n^2 + k*n^3 + 2*k^2*n^2 + k^3*n) + (k*n^3 + n^4 + 2*k*n^3 + k^2*n^2) + (2*k^2*n^2 + 2*k*n^3 + 4*k^2*n^2 + 2*k^3*n) + (k^3*n + k^2*n^2 + 2*k^3*n + k^4)
 #= n^4 + (k*n^3 + k*n^3 + 2*k*n^3 + 2*k*n^3) + (k^2n^2 + 2*k^2*n^2 + k^2*n^2 + 2*k^2*n^2 + 4*k^2*n^2 + k^2*n^2) + (k^3*n + 2*k^3*n + k^*n + 2*k^3*n) + k^4
 #= n^4 + 6*k*n^3 + 11*k^2n^2 + 6*k^3*n + k^4
+#
+#(n^2 + 3*k*n + k^2)^2
+#(n^2 + 3*k*n + k^2) * (n^2 + 3*k*n + k^2)
+#n^4 + 3*k*n^3 + n^2*k^2 + 3*k*n^3 + 9*k^2*n^2 + 3*k^3*n + k^2+n^2 + 3*k^3*n + k^4
+#n^4 + (3*k*n^3 + 3*k*n^3) + (n^2*k^2+9*k^2*n^2) + (3*k^3*n + 3*k^3*n) + k^4
+#n^4 + 6*k*n^3 + 11*k^2*n^2 + 6*k^3*n + k^4
+#

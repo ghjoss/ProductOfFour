@@ -39,8 +39,8 @@ if bash:
 	dirTXT = "/mnt/d/source/PythonApps/ProductOfFourSheet/Output/"
 else:
 	winDrive = "D:"  # the windows drive for the output files
-	dirCSV = winDrive + "\\source\\PythonApps\\ProductOfFourSheet\\Output2\\"
-	dirTXT = winDrive + "\\source\\PythonApps\\ProductOfFourSheet\\Output2\\"
+	dirCSV = winDrive + "\\source\\PythonApps\\ProductOfFourSheet\\Output\\"
+	dirTXT = winDrive + "\\source\\PythonApps\\ProductOfFourSheet\\Output\\"
 
 # for debugging, work with a smaller set of integers and increments
 if debug:

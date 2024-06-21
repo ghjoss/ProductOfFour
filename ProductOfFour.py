@@ -20,7 +20,6 @@ maxPrime = 100000 #50000
 splits = {}
 splits[0] = time.time()
 
-debug = False
 lav = len(sys.argv)
 if lav > 1:
 	arg1 = sys.argv[1]
@@ -31,22 +30,23 @@ if arg1.startswith("B"):
 else:
 	bash = False
 
-# bash=False apps is on windows drive D as accessed from win10  =True/app is on windows drive F as accessed from bash on win10
+# bash=False: The program is on windows drive D as accessed from win10  =True: program is running on Linux
 # directory names must end with a directory specification separator (/ for linux, \ for ms Windows). Otherwise the final node will
 # be treates as a file name prefix.
+drive = "d"
 if bash:
-	dirCSV = "/mnt/d/source/PythonApps/ProductOfFourSheet/Output/"
+	dirCSV = "/mnt/" + drive + "/source/PythonApps/ProductOfFourSheet/Output/"
 	dirTXT = "/mnt/d/source/PythonApps/ProductOfFourSheet/Output/"
 else:
-	winDrive = "D:"  # the windows drive for the output files
+	winDrive = drive + ":"  # the windows drive for the output files
 	dirCSV = winDrive + "\\source\\PythonApps\\ProductOfFourSheet\\Output\\"
 	dirTXT = winDrive + "\\source\\PythonApps\\ProductOfFourSheet\\Output\\"
 
-# for debugging, work with a smaller set of integers and increments
+debug = False
 if debug:
 	testNode="TEST_"
-	intMax = 51
-	incrementMax = 21
+	intMax = 200 #51
+	incrementMax = 50 #21
 else:
 	testNode = ""
 	intMax = 5551 				# top of range, will actually iterate n - 1
@@ -82,11 +82,12 @@ for increment in range(1,incrementMax):
 	numModList = []		# list of the first <increment> values of <increment> mod(calculated integer)
 
 	header0 = "increment == {0:d}".format(increment)
-	if bash:
-		header1 = "num == (i x (i+{0:d}) x (i+{1:d}) x (i+{2:d}) + {3:d})".format(increment,2*increment,3*increment,inc4) + " -or-  num == (i x {0:d} + (i + {0:d})²)²".format(increment)
-	else:
-		header1 = "num == (i x (i+{0:d}) x (i+{1:d}) x (i+{2:d}) + {3:d})".format(increment,2*increment,3*increment,inc4) + " -or-  num == (i x {0:d} + (i + {0:d})²)²".format(increment)
-
+	header1 = "num == (i x (i+{0:d}) x (i+{1:d}) x (i+{2:d}) + {3:d})".format(increment,2*increment,3*increment,inc4) + " -or-  num == (i x {0:d} + (i + {0:d})²)²".format(increment)
+	#if bash:
+	#	header1 = "num == (i x (i+{0:d}) x (i+{1:d}) x (i+{2:d}) + {3:d})".format(increment,2*increment,3*increment,inc4) + " -or-  num == (i x {0:d} + (i + {0:d})²)²".format(increment)
+	#else:
+	#	header1 = "num == (i x (i+{0:d}) x (i+{1:d}) x (i+{2:d}) + {3:d})".format(increment,2*increment,3*increment,inc4) + " -or-  num == (i x {0:d} + (i + {0:d})²)²".format(increment)
+	
 	if generateSheet:
 		hdr1 = ["i","num","sq.Root"]
 		hdr2 = "factor"			
@@ -104,10 +105,10 @@ for increment in range(1,incrementMax):
 
 		fTXT = open(dirTXT + 'Inc_'+testNode+str(increment)+'.txt', 'w') # for running on laptop machine
 
-	#loop through the first "intMax" integers, calculating the product of four integers
-	# in an arithmetic sequencce separated by the current increment
+	#loop through the first "intMax" integers, calculating the product of four integers that are
+	#in an arithmetic sequencce separated by the current increment
 	#Note that analysis has shown that the square root of the product for the current index (== i) can
-	#be calculated as the sum: i + (i+1)**2. This is probably faster than doing the product and then taking the square root.
+	#be calculated as the sum: (i + (i+increment)**2). This is probably faster than doing the product and then taking the square root.
 	for i in range(1,intMax):
 		factorsList = []
 		if generateReport:	
@@ -180,7 +181,6 @@ for increment in range(1,incrementMax):
 							factorizationTestNum /= p
 							factorizatoinTestNum = int(factorizationTestNum)
 							if factorizationTestNum == 1:
-#								factors = factors + "," + str(p)
 								factorsList.append(p)
 								breakJ = 1
 								break # while factorizationTestNum %p == 0
@@ -301,11 +301,13 @@ for increment in range(1,incrementMax):
 # 	8 * 13 * 18 * 23 + 625  (start = 8, diff = 5: 5**4)
 # 	5 * 13 * 21 * 29 + 4096 (start = 5, diff = 8: 8**4)
 # 	1 * 14 * 27 * 40 + 28561 (start = 1, diff = 13: 13 ** 4)
-# Thus the dictionary entry for 43681 is: 43681,209,13,1,8,5,5,8,1,13print("Processing analysis of calculated squares...")
-osq = collections.OrderedDict(sorted(squaresDict.items()))
+# Thus the dictionary entry for 43681 is: 43681,209,13,1,8,5,5,8,1,13
+#
+print("Processing analysis of calculated squares...")
+osq = collections.OrderedDict(sorted(squaresDict.items())) #osq: o_rdered sq_uares dictionary
 osqCt = 0
 lMax = -1
-with open("D:\\source\\pythonapps\\productoffoursheet\output2\\bigdictionary.txt","w") as bdo:
+with open("D:\\source\\pythonapps\\productoffoursheet\output\\bigdictionary.txt","w") as bdo:
     for o in osq:
         l = len(osq[o])
         if l > 6:
@@ -313,23 +315,25 @@ with open("D:\\source\\pythonapps\\productoffoursheet\output2\\bigdictionary.txt
             osqCt += 1
             if l > lMax:
                 lMax = l
-    print("Max length of dictionary entries: {0:d}".format(lMax), file=bdo)        
+    print("Max length of dictionary entries: {0:d}".format(lMax), file=bdo)   
+
 if osqCt == 0:
     print("No data",file=bdo)
     
 if generateSheet:		 
 	header = ["Number","Root"]
-	header_len = 2
 	header2 = ["1st of four","Incr"]
-	header2_len = 2 * (lMax - 2)
+	header2_len = 2 * (lMax - len(header))
 	header3 = ["factor"]
 	fullHdr = header + header2 * (lMax - 2) + header3*13
 	fileNo = 1
-	count=0
+	outputLineCount=0
+
 	for k,v in osq.items():
-		count += 1
-		if count % 250000 == 1:
-			if count != 1:
+		vCSV = v.copy()
+		outputLineCount += 1
+		if outputLineCount % 250000 == 1:
+			if outputLineCount != 1:
 				fsqCSV.close()
 			fsqCSV = open(dirCSV + "squares_"+testNode+str(fileNo)+".csv","w",newline='')
 			writer = csv.writer(fsqCSV)
@@ -338,11 +342,12 @@ if generateSheet:
 		
 		factorsList = factorsDict[k]
 		for i in range(header2_len - len(v) + 2):
-			v.append("_")
+			vCSV.append("_")
 			
-		newlist = v + factorsList
+		newlist = vCSV + factorsList
 		writer.writerow(newlist)
 	fsqCSV.close()
+
 if generateReport:
 	fsqTXT = open(dirTXT + "squares.txt","w")
 	lines = 0
@@ -352,37 +357,13 @@ if generateReport:
 	headerL = "-" * len(header)
 			  
 	for k,v in osq.items():
-			   
+		vTXT = v.copy()
 		if lines % 45 == 0:
 			if lines != 0:
 				print("",file=fsqTXT)
 			print(headerL,file=fsqTXT)
 			print(header,file=fsqTXT)
 			print(headerL,file=fsqTXT)
-		for i in range(1,10-len(v)+1):
-			v.append("")
-		for idx,word in enumerate(v):
-			if idx == 0:
-				offset = lines + 1
-				num = word
-			elif idx == 1:
-				sqrt = word
-			elif idx == 2:
-				i1Sum = word
-			elif idx == 3:
-				inc1 = word
-			elif idx == 4:
-				i2 = word
-			elif idx == 5:
-				inc2 = word
-			elif idx == 6:
-				i3 = word
-			elif idx == 7:
-				inc3 = word
-			elif idx == 8:
-				i4 = word
-			elif idx == 9:
-				inc4 = word
 		factorsList = factorsDict[k]
 		factors = ""
 		l = len(factorsList) - 1
@@ -391,8 +372,44 @@ if generateReport:
 				factors += str(int(word)) + " x "
 			else:
 				factors += str(int(word))
-		numSqrt = "{0:^30}".format("{0}({1})".format(num,sqrt))+"{0:^15}{1:^10}{2:^15}{3:^10}{4:^15}{5:^10}{6:^15}{7:^10}".format(i1Sum,inc1,i2,inc2,i3,inc3,i4,inc4)
-		print("{0:s}{1:s}".format(numSqrt,factors),file=fsqTXT)
+
+		num = vTXT[0]
+		sqrt = vTXT[1]
+		v2 = vTXT[2:] # slice off number and sqare root
+		appendLen = lMax + 4 - len(v2)
+		v2 = v2 + ["-"] * appendLen
+
+		# print(vTXT[2:])
+		# print("{0:^2}: {1}".format(len(v2),v2))
+		# print("")
+
+		try:
+			for idx,val in enumerate(v2):
+				if not (idx%8 == 0):
+					continue 
+				if v2[idx] == "-":
+					break
+				i1Sum = v2[idx]
+				inc1 = v2[idx+1]
+				i2 = v2[idx+2]
+				inc2 = v2[idx+3]
+				i3 = v2[idx+4]
+				inc3 = v2[idx+5]
+				i4 = v2[idx+6]
+				inc4 = v2[idx+7]
+				
+				if idx == 0:
+					numSqrt = "{0:^30}".format("{0}({1})".format(num,sqrt))+"{0:^15}{1:^10}{2:^15}{3:^10}{4:^15}{5:^10}{6:^15}{7:^10}".format(i1Sum,inc1,i2,inc2,i3,inc3,i4,inc4)
+					print("{0:s}{1:s}".format(numSqrt,factors),file=fsqTXT)
+				else:
+					numSqrt = "{: <30}".format(" ")+"{0:^15}{1:^10}{2:^15}{3:^10}{4:^15}{5:^10}{6:^15}{7:^10}".format(i1Sum,inc1,i2,inc2,i3,inc3,i4,inc4)
+					print("{0:s}".format(numSqrt),file=fsqTXT)
+		except:
+			print("Index out of range")
+			print(idx,v2)
+			sys.exit()
+			
+
 		lines += 1
 ct = len(splits)
 splits[ct] = time.time()

@@ -51,6 +51,7 @@ import _100KPrimes
 
 
 foundDict = {}
+fileDict = {}
 byFile = [dict() for x in range(fileCount+1)]
 
 if bash:
@@ -106,6 +107,7 @@ for fileNo in range(1,fileCount + 1):
 							primeLineCt = 0
 							print("  " + primeLine,file=fOut)
 							primeLine = ""
+						fileDict[int(pr)] = fileNo
 
 				
 	if skip < 0:
@@ -116,6 +118,17 @@ for fileNo in range(1,fileCount + 1):
 			primeLine = ""
 fOut.close()
 
+fOut = open(filePath + "PrimesByInitialFile.txt","w")
+osq = collections.OrderedDict(sorted(fileDict.items()))
+s:str = ""
+i=0
+for key,val in osq.items():
+	s = s + "{}({}) ".format(key,val)
+	i+=1
+	if i == 8:
+		print(s,file=fOut)
+		i = 0
+		s=""
 
 fOut = open(filePath + "PrimesInFilesSorted.txt","w")
 for fileNo in range(1, fileCount + 1):

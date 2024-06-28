@@ -23,22 +23,21 @@ import collections
 import time
 import csv
 
-# set addThousandsSeparator to False to cause large numbers to be written without
-# a thousands, millions, ... ',' separator.
-addThousandsSeparator = True
-
-# Function to format numbers with comma separators
-"""Format an integer with comma separators for thousands places."""
-def format_with_commas(num:int):
-	return f'{num:,}' if addThousandsSeparator else str(num)
 
 splits = {}
 splits[0] = time.time()
 
 # To run in a non-Windows environment, pass in a capital "B"
 lav = len(sys.argv)
-arg1 = sys.argv[1].lower() if lav > 1 else "W"
-bash = True if arg1.startswith("b") else False
+if lav > 1:
+	arg1 = sys.argv[1]
+else:
+	arg1 = "W"
+if arg1.startswith("B"):
+	bash = True
+else:
+	bash = False
+
 # bash==False: The program is on windows a drive whose letter is defined in variable 'drive' as accessed from win10  
 # bash==True: program is running on Linux
 # 
@@ -60,7 +59,7 @@ else:
 # for debugging purposes, run with a smaller number of initial integers and 
 # a smaller number of sequence increments. Set debug=False to run with
 # larger values
-debug = True
+debug = False
 if debug:
 	testNode="TEST_"			# when debugging, prepend 'TEST_' to the output file names
 	startOfSequenceMax = 200
@@ -219,7 +218,7 @@ for increment in range(1,incrementMax):
 
 		if generateSheet:
 			csvRow = [startInteger,squareNum,sqrtNum]+factorsList
-			writer.writerow([format_with_commas(number) for number in csvRow])
+			writer.writerow(csvRow)
 
 		if generateReport:
 			factors = ""
@@ -227,16 +226,11 @@ for increment in range(1,incrementMax):
 			if l == 0:
 				primeRoots += 1
 			for idx,word in enumerate(factorsList):
-				word = format_with_commas(int(word))
 				if idx < l:
-					factors += str(word) + " x "
+					factors += str(int(word)) + " x "
 				else:
-					factors += str(word)
-#			print("{0:8d}{1:^30d}".format(startInteger,squareNum)+"{0:^d}({1})".format(sqrtNum,factors),file=fTXT)
-			startIntegerT = format_with_commas(startInteger)
-			squareNumT = format_with_commas(squareNum)
-			sqrtNumT = format_with_commas(sqrtNum)
-			print("{0:8}{1:^30}".format(startIntegerT,squareNumT)+"{0:^}({1})".format(sqrtNumT,factors),file=fTXT)
+					factors += str(int(word))
+			print("{0:8d}{1:^30d}".format(startInteger,squareNum)+"{0:^d}({1})".format(sqrtNum,factors),file=fTXT)
 
 		if not (squareNum in factorsDict):
 			factorsDict[squareNum] = factorsList
@@ -262,8 +256,10 @@ for increment in range(1,incrementMax):
 		moduloPrint = ""
 		moduloPrintHeader = "Calculated number modulo " + str(increment) + " cycle: "
 		moduloPrintHeaderLen = len(moduloPrintHeader)
+		offset = 0
 		rightAst = ""
-		for offset,m in enumerate(numModList,start=1):
+		for m in numModList:
+			offset += 1
 			if offset == moduloMidpoint:
 				if incrementIsOdd:
 					strM = ('* ' + str(m)).rjust(11)
@@ -283,13 +279,16 @@ for increment in range(1,incrementMax):
 		if moduloPrint != "" and increment != 1:
 			print(moduloPrintHeader + moduloPrint,file=fTXT)
 
+		offset = 0
 		rightAst = ""
 		moduloPrint = ""
 		# pad print header to be as long as the prior header
 		moduloPrintHeader = ("Square root modulo " + str(increment) + " cycle: ").ljust(moduloPrintHeaderLen)
 
+		offset = 0
 		rightAst = ""
-		for offset,m in enumerate(sqrtModList,start=1):
+		for m in sqrtModList:
+			offset += 1
 			if offset == moduloMidpoint:
 				if incrementIsOdd:
 					strM = ('* ' + str(m)).rjust(11)
@@ -349,7 +348,7 @@ if osqCt == 0:
     print("No data",file=bdo)
     
 if generateSheet:
-	print("Squares analysis .csv sheets")		 
+	print(".csv sheets")		 
 	header = ["Number","Root"]
 	header2 = ["1st of four","Incr"]
 	header2_len = 2 * (lMax - len(header))
@@ -359,8 +358,7 @@ if generateSheet:
 	outputLineCount=0
 
 	for key,val in osq.items():
-		vCSV = [format_with_commas(number) for number in val.copy()]
-
+		vCSV = val.copy()
 		outputLineCount += 1
 		if outputLineCount % 250000 == 1:
 			if outputLineCount != 1:
@@ -377,11 +375,10 @@ if generateSheet:
 			
 		newlist = vCSV + factorsList
 		writer.writerow(newlist)
-	splits[len(splits)] = time.time()
 	fsqCSV.close()
 
 if generateReport:
-	print("Squares analysis .txt reports ")
+	print(".txt reports ")
 	fsqTXT = open(dirTXT + testNode+"squares.txt","w")
 	lines = 0
 	header = "{0:^30}".format("Number(Root)")
@@ -390,7 +387,7 @@ if generateReport:
 	headerL = "-" * len(header)
 			  
 	for key,val in osq.items():
-		vTXT = [format_with_commas(number) for number in val.copy()]
+		vTXT = val.copy()
 		if lines % 45 == 0:
 			if lines != 0:
 				print("",file=fsqTXT)
@@ -444,8 +441,6 @@ if generateReport:
 			
 
 		lines += 1
-	splits[len(splits)] = time.time()
-
 ct = len(splits)
 splits[ct] = time.time()
 
@@ -479,3 +474,20 @@ print("Processing complete.")
 #n^4 + (3*k*n^3 + 3*k*n^3) + (n^2*k^2+9*k^2*n^2) + (3*k^3*n + 3*k^3*n) + k^4
 #n^4 + 6*k*n^3 + 11*k^2*n^2 + 6*k^3*n + k^4
 #
+print("Closure testing")
+ct = 0
+fOut = open(testNode+"closure.txt","w")
+print("closure",file=fOut)
+for key,val in osq.items():
+
+	for key2,val2 in osq.items():
+		if key2 == key:
+			continue
+		key3 = key * key2
+		if not key3 in osq:
+			print("{} * {} = {}".format(key,key2,key3),file=fOut)
+	ct += 1
+	if ct > 1:
+		break
+fOut.close()
+	

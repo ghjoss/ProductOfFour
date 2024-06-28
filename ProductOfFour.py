@@ -256,10 +256,8 @@ for increment in range(1,incrementMax):
 		moduloPrint = ""
 		moduloPrintHeader = "Calculated number modulo " + str(increment) + " cycle: "
 		moduloPrintHeaderLen = len(moduloPrintHeader)
-		offset = 0
 		rightAst = ""
-		for m in numModList:
-			offset += 1
+		for offset,m in enumerate(numModList,start=1):
 			if offset == moduloMidpoint:
 				if incrementIsOdd:
 					strM = ('* ' + str(m)).rjust(11)
@@ -285,10 +283,8 @@ for increment in range(1,incrementMax):
 		# pad print header to be as long as the prior header
 		moduloPrintHeader = ("Square root modulo " + str(increment) + " cycle: ").ljust(moduloPrintHeaderLen)
 
-		offset = 0
 		rightAst = ""
-		for m in sqrtModList:
-			offset += 1
+		for offset,m in enumerate(sqrtModList,start=1):
 			if offset == moduloMidpoint:
 				if incrementIsOdd:
 					strM = ('* ' + str(m)).rjust(11)
@@ -348,7 +344,7 @@ if osqCt == 0:
     print("No data",file=bdo)
     
 if generateSheet:
-	print(".csv sheets")		 
+	print("Squares analysis .csv sheets")		 
 	header = ["Number","Root"]
 	header2 = ["1st of four","Incr"]
 	header2_len = 2 * (lMax - len(header))
@@ -378,7 +374,7 @@ if generateSheet:
 	fsqCSV.close()
 
 if generateReport:
-	print(".txt reports ")
+	print("Squares analysis .txt reports ")
 	fsqTXT = open(dirTXT + testNode+"squares.txt","w")
 	lines = 0
 	header = "{0:^30}".format("Number(Root)")

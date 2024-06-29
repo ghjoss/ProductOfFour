@@ -10,13 +10,16 @@
 	See incrementMax and startOfSequenceMax below.
 
 	See the on-line encyclopedia of integer sequences #A062938 (https://oeis.org/A062938)
-	For increment=1: The square roots are the values in sequence #A028387. This sequence,
-						generalized for all increments (not only inc=1), is used in the
-						code below to evaluate the square roots without having to use the
-						sqrt() function. 
+	This sequence, generalized for all increments (not only inc=1), is used in the
+	code below to evaluate the square roots without having to use the
+	sqrt() function. 
+
+	For increment=1: The square roots are the values in sequence #A028387. 
 	For increment=2: The square roots are the positive values in sequence #A028875
 	For increment=3: The square roots are the positive values in sequence #A190576
 	For increment=4: The square roots are the positive values in sequence #A134594
+	For increment=5 through increment=25, no sequences were found referencing the
+	square roots.
 """
 import sys
 import collections
@@ -218,7 +221,7 @@ for increment in range(1,INCREMENT_MAX):
 				#end 'while j < len(primes) and breakJ == 0
 
 		if GENERATE_SHEET:
-			csvRow = [startInteger, squareNum, sqrtNum] +  factorsList
+			csvRow = [startInteger, squareNum, sqrtNum] + factorsList
 			writer.writerow([FormatWithCommas(number) for number in csvRow])
 
 		if GENERATE_REPORT:
@@ -253,7 +256,7 @@ for increment in range(1,INCREMENT_MAX):
 		print("Maximum prime factor: {0:d} (at test for {1:d})".format(maxRootFactor, maxNum),file=fTXT)
 
 		if increment % 2 == 1:
-			moduloMidpoint = (increment -1) / 2
+			moduloMidpoint = (increment - 1) / 2
 			incrementIsOdd = True
 		else:
 			moduloMidpoint = increment / 2
@@ -282,7 +285,7 @@ for increment in range(1,INCREMENT_MAX):
 
 		if moduloPrint != "" and increment != 1:
 			print(moduloPrintHeader + moduloPrint, file=fTXT)
-
+		
 		rightAst = ""
 		moduloPrint = ""
 		# pad print header to be as long as the prior header
@@ -331,25 +334,36 @@ for increment in range(1,INCREMENT_MAX):
 #
 print("Multiple starting integer/increment pairs generate the same square number. Iterate over the")
 print("squaresDict collection to find these sequences/increment pairs.")
-print("e.g.: 43861 == 209*209 == 13*14*15*16+1 == 8*13*18*23+625 (5^4) == 5*13*21*29+512 (8^4) == 1 * 14 * 27 * 40 + 28561 (13^4)")
+# "e.g.: 43861 == 209*209 
+# == 13*14*15*16+1 
+# == 8*13*18*23+625 (5^4) 
+# == 5*13*21*29+512 (8^4) 
+# == 1 * 14 * 27 * 40 + 28561 (13^4)")
 osq = collections.OrderedDict(sorted(squaresDict.items())) #osq: o_rdered sq_uares dictionary
 osqCt = 0
 lMax = -1
+t = 0
+print("Fred")
 with open(DIR_TXT+TEST_NODE+"bigdictionary.txt","w") as bdo:
-    for o in osq:
-        listLen = len(osq[o])
-        if listLen > 6:
-            print(listLen, ":", osq[o], file=bdo)
-            osqCt += 1
-            if listLen > lMax:
-                lMax = listLen
-    print("Max length of dictionary entries: {0:d}".format(lMax), file=bdo)
-
+	for o in osq:
+		listLen = int((len(osq[o]) - 2) / 2)
+		if listLen > 2:
+			if t == 0:
+				t = 1
+				print(osq[o][2:])
+			print(listLen, ":", osq[o][:2], osq[o][2:], file=bdo)
+			osqCt += 1
+		if listLen > lMax:
+			lMax = listLen
+	print("Max length of dictionary entries: {0:d}".format(lMax), file=bdo)
+t
 if osqCt == 0:
     print("No data",file=bdo)
 
 if GENERATE_SHEET:
-	print("Squares analysis .csv sheets")		 
+	print("Squares analysis .csv sheets")
+	ct = len(splits)
+	splits[ct] = time.time()		 
 	header = ["Number","Root"]
 	header2 = ["1st of four","Incr"]
 	header2_len = 2 * (lMax - len(header))
@@ -377,11 +391,16 @@ if GENERATE_SHEET:
 
 		newlist = vCSV + factorsList
 		writer.writerow(newlist)
-	splits[len(splits)] = time.time()
+	ct2 = len(splits)
+	splits[ct2] = time.time()
 	fsqCSV.close()
+	print(".csv analysis duration {duration:4.3f}".format(duration=splits[ct2] - splits[ct]))
+
 
 if GENERATE_REPORT:
 	print("Squares analysis .txt reports ")
+	ct = len(splits)
+	splits[ct] = time.time()
 	fsqTXT = open(DIR_TXT + TEST_NODE+"squares.txt","w")
 	lines = 0
 	header = "{0:^30}".format("Number(Root)")
@@ -445,6 +464,9 @@ if GENERATE_REPORT:
 
 		lines += 1
 	splits[len(splits)] = time.time()
+	ct2 = len(splits)
+	splits[ct2] = time.time()
+	print(".txt analysis duration {duration:4.3f}".format(duration=splits[ct2] - splits[ct]))
 
 ct = len(splits)
 splits[ct] = time.time()

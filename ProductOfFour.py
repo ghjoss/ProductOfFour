@@ -39,10 +39,30 @@ def FormatWithCommas(num:int):
 
 splits = {}
 splits[0] = time.time()
+# for debugging purposes, run with a smaller number of initial integers and
+# a smaller number of sequence increments. Set debug=False to run with
+# larger values
+arg1 = "t"
+DEBUG = True
+if len(sys.argv) > 1:
+	arg1 = sys.argv[1].lower()
+	if arg1.startswith("f") or arg1 == "0":
+		DEBUG = False
+
+if DEBUG:
+	TEST_NODE = "TEST_"			# when debugging, prepend 'TEST_' to the output file names
+	START_OF_SEQUENCE_MAX = 200
+	INCREMENT_MAX = 50
+# startOfSequenceMax = 5551 and incrementMax = 1201 runs for about 10 minutes on a PC running
+# Windows 10 on a Core i7 running at 2.4Ghz. Memory = 32GB.
+else:
+	TEST_NODE = ""
+	START_OF_SEQUENCE_MAX = 5551				# top of range, will actually iterate n - 1
+	INCREMENT_MAX = 1201
 
 # To run in a non-Windows environment, pass in a capital "B"
-arg1 = sys.argv[1].lower() if len(sys.argv) > 1 else "W"
-BASH = True if arg1.startswith("b") else False
+arg2 = sys.argv[2].lower() if len(sys.argv) > 2 else "W"
+BASH = True if arg2.startswith("b") else False
 # bash==False: The program is on windows a drive whose letter is defined in variable 'drive' as accessed from win10
 # bash==True: program is running on Linux
 #
@@ -57,24 +77,9 @@ if BASH:
 	DIR_TXT = "/mnt/d/source/PythonApps/ProductOfFourSheet/Output/"
 else:
 	# assumes Debian or ubuntu running in WSL (Windows Subystem for Linux)
-	WIN_DRIVE = DRIVE + ":"  # the windows drive for the output files
+	WIN_DRIVE = DRIVE + ":"	 # the windows drive for the output files
 	DIR_CSV = WIN_DRIVE + "\\source\\PythonApps\\ProductOfFourSheet\\Output\\"
 	DIR_TXT = WIN_DRIVE + "\\source\\PythonApps\\ProductOfFourSheet\\Output\\"
-
-# for debugging purposes, run with a smaller number of initial integers and
-# a smaller number of sequence increments. Set debug=False to run with
-# larger values
-DEBUG = True
-if DEBUG:
-	TEST_NODE = "TEST_"			# when debugging, prepend 'TEST_' to the output file names
-	START_OF_SEQUENCE_MAX = 200
-	INCREMENT_MAX = 50
-# startOfSequenceMax = 5551 and incrementMax = 1201 runs for about 10 minutes on a PC running
-# Windows 10 on a Core i7 running at 2.4Ghz. Memory = 32GB.
-else:
-	TEST_NODE = ""
-	START_OF_SEQUENCE_MAX = 5551 				# top of range, will actually iterate n - 1
-	INCREMENT_MAX = 1201
 
 GENERATE_SHEET = True			# True=generate spreadsheet data, False=no spreadsheet data
 GENERATE_REPORT = True			# True=generate text report, False=no text report
@@ -88,7 +93,7 @@ sys.path.append('.')
 import _100KPrimes				#100,000 prime numbers in a list named "primes"
 # maxPrime: in the array of primes, this is the offset of the last
 # prime to process.
-MAX_PRIME = 100000 				#50000
+MAX_PRIME = 100000				#50000
 
 # add the primes as keys to a dictionary "primeDict"
 primesDict = {} # add the p
@@ -116,7 +121,7 @@ for increment in range(1,INCREMENT_MAX):
 
 	# for this increment, determine and print the headers.
 	HEADER_0 = "increment == {0:d}".format(increment)
-	HEADER_1 = "num == (i x (i+{0:d}) x (i+{1:d}) x (i+{2:d}) + {3:d})".format(increment,2*increment,3*increment,inc4) + " -or-  num == (i x {0:d} + (i + {0:d})²)²".format(increment)
+	HEADER_1 = "num == (i x (i+{0:d}) x (i+{1:d}) x (i+{2:d}) + {3:d})".format(increment,2*increment,3*increment,inc4) + " -or-	 num == (i x {0:d} + (i + {0:d})²)²".format(increment)
 
 	# headers for .CSV file (spreadsheet)
 	if GENERATE_SHEET:
@@ -156,7 +161,7 @@ for increment in range(1,INCREMENT_MAX):
 		# factorizationTestNum = sqrtNum = num ** 0.5
 		# alternative, equivalent values
 		i1Sum = startInteger + increment
-		factorizationTestNum = sqrtNum = startInteger*increment + i1Sum * i1Sum  #factorizationTestNum = sqrtNum = i*increment + (i+increment)²
+		factorizationTestNum = sqrtNum = startInteger*increment + i1Sum * i1Sum	 #factorizationTestNum = sqrtNum = i*increment + (i+increment)²
 		# squareNum = (iProd + i1Sum**2)**2
 		squareNum = sqrtNum * sqrtNum
 
@@ -165,7 +170,7 @@ for increment in range(1,INCREMENT_MAX):
 			sqrtModList.append(sqrtNum % increment)
 			numModList.append(squareNum % increment)
 
-		if squareNum in squaresDict:      # have we already seen this number when processing a previous arithmetic sequence?
+		if squareNum in squaresDict:	  # have we already seen this number when processing a previous arithmetic sequence?
 			# yes, append the current value of i and the increment to the list entry for this number
 			sqList = squaresDict[squareNum]	 # get the list
 			sqList.append(startInteger)		 # add current '1st of the four arithmetic sequence' value (i)
@@ -239,7 +244,7 @@ for increment in range(1,INCREMENT_MAX):
 			startIntegerT = FormatWithCommas(startInteger)
 			squareNumT = FormatWithCommas(squareNum)
 			sqrtNumT = FormatWithCommas(sqrtNum)
-			print("{0:8}{1:^30}".format(startIntegerT, squareNumT)+"{0:^}({1})".format(sqrtNumT, factors), file=fTXT)
+			print(f'{startIntegerT:8}{squareNumT:^30}{sqrtNumT:^}({factors})',file=fTXT)
 
 		if squareNum not in factorsDict:
 			factorsDict[squareNum] = factorsList
@@ -249,11 +254,11 @@ for increment in range(1,INCREMENT_MAX):
 			sys.stdout.write(".")
 			sys.stdout.flush()
 			if startInteger % 2500 == 1:
-				print("{0:d} products analyzed".format(startInteger))
+				print(f"{startInteger} products analyzed")
 
 	if GENERATE_REPORT:
-		print("There are {0:d} prime square roots out of {1:d} calculations.".format(primeRoots, START_OF_SEQUENCE_MAX - 1), file=fTXT)
-		print("Maximum prime factor: {0:d} (at test for {1:d})".format(maxRootFactor, maxNum),file=fTXT)
+		print(f"There are {primeRoots:d} prime square roots out of {START_OF_SEQUENCE_MAX - 1:d} calculations.", file=fTXT)
+		print(f"Maximum prime factor: {maxRootFactor:d} (at test for {maxNum:d})", file=fTXT)
 
 		if increment % 2 == 1:
 			moduloMidpoint = (increment - 1) / 2
@@ -318,18 +323,19 @@ for increment in range(1,INCREMENT_MAX):
 	if GENERATE_REPORT:
 		fTXT.close()
 
-	splits[len(splits)] = time.time()
-	print("Processing complete for increment {inc:d}".format(inc=increment))
+	ct = len(splits)
+	splits[ct] = time.time()
+	print(f"Processing complete for increment {increment:d}, duration {(splits[ct] - splits[ct-1]):4.3f}")
 #end 'for increment in range(1,...'
 
 #
 # Each calculated square number was added as a key to a dictionary (squaresDict). That dictionary keeps track of all the
 # four number arithmetic sequences and the difference between consecutive numbers in that sequence.
 # So, for instance, the number 43681 (209 * 209) is generated by:
-# 	13 * 14 * 15 * 16 + 1   (start = 13,diff = 1: 1**4)
-# 	8 * 13 * 18 * 23 + 625  (start = 8, diff = 5: 5**4)
-# 	5 * 13 * 21 * 29 + 4096 (start = 5, diff = 8: 8**4)
-# 	1 * 14 * 27 * 40 + 28561 (start = 1, diff = 13: 13 ** 4)
+#	13 * 14 * 15 * 16 + 1	(start = 13,diff = 1: 1**4)
+#	8 * 13 * 18 * 23 + 625	(start = 8, diff = 5: 5**4)
+#	5 * 13 * 21 * 29 + 4096 (start = 5, diff = 8: 8**4)
+#	1 * 14 * 27 * 40 + 28561 (start = 1, diff = 13: 13 ** 4)
 # Thus the dictionary entry for 43681 is: 43681,209,13,1,8,5,5,8,1,13
 #
 print("Multiple starting integer/increment pairs generate the same square number. Iterate over the")
@@ -342,23 +348,19 @@ print("squaresDict collection to find these sequences/increment pairs.")
 osq = collections.OrderedDict(sorted(squaresDict.items())) #osq: o_rdered sq_uares dictionary
 osqCt = 0
 lMax = -1
-t = 0
-print("Fred")
+
 with open(DIR_TXT+TEST_NODE+"bigdictionary.txt","w") as bdo:
 	for o in osq:
-		listLen = int((len(osq[o]) - 2) / 2)
+		listLen = int((len(osq[o]) - 2))
 		if listLen > 2:
-			if t == 0:
-				t = 1
-				print(osq[o][2:])
 			print(listLen, ":", osq[o][:2], osq[o][2:], file=bdo)
 			osqCt += 1
 		if listLen > lMax:
 			lMax = listLen
-	print("Max length of dictionary entries: {0:d}".format(lMax), file=bdo)
-t
+	print(f"Max length of dictionary entries: {lMax:d}", file=bdo)
+
 if osqCt == 0:
-    print("No data",file=bdo)
+	print("No data",file=bdo)
 
 if GENERATE_SHEET:
 	print("Squares analysis .csv sheets")
@@ -394,7 +396,7 @@ if GENERATE_SHEET:
 	ct2 = len(splits)
 	splits[ct2] = time.time()
 	fsqCSV.close()
-	print(".csv analysis duration {duration:4.3f}".format(duration=splits[ct2] - splits[ct]))
+	print(f".csv analysis duration {splits[ct2] - splits[ct]:4.3f} seconds")
 
 
 if GENERATE_REPORT:
@@ -403,8 +405,8 @@ if GENERATE_REPORT:
 	splits[ct] = time.time()
 	fsqTXT = open(DIR_TXT + TEST_NODE+"squares.txt","w")
 	lines = 0
-	header = "{0:^30}".format("Number(Root)")
-	header2 = "{0:^15}{1:^10}".format("1st of four","incr")
+	header = f"{'Number(Root)':^30}"
+	header2 = f"{'1st of four':^15}{'incr':^10}"
 	header = header + header2 * 4 + "Prime Factors"
 	headerL = "-" * len(header)
 
@@ -429,12 +431,8 @@ if GENERATE_REPORT:
 		squareNum = vTXT[0]
 		sqrt = vTXT[1]
 		vTXT2 = vTXT[2:] # slice off number and sqare root
-		appendLen = lMax + 4 - len(vTXT2)
+		appendLen = lMax + 12 - len(vTXT2)
 		vTXT2 = vTXT2 + ["-"] * appendLen
-
-		# print(vTXT[2:])
-		# print("{0:^2}: {1}".format(len(v2),v2))
-		# print("")
 
 		try:
 			for idx, val in enumerate(vTXT2):
@@ -456,30 +454,30 @@ if GENERATE_REPORT:
 					print("{0:s}{1:s}".format(numSqrt,factors),file=fsqTXT)
 				else:
 					numSqrt = "{: <30}".format(" ")+"{0:^15}{1:^10}{2:^15}{3:^10}{4:^15}{5:^10}{6:^15}{7:^10}".format(i1Sum, inc1, i2, inc2, i3, inc3, i4,inc4)
-					print("{0:s}".format(numSqrt),file=fsqTXT)
+					print(f"{numSqrt:s}", file=fsqTXT)
 		except IndexError:
 			print("Index out of range")
-			print(idx, vTXT2)
+			print(f'{lMax = } {idx =} {vTXT2 = }')
 			sys.exit()
 
 		lines += 1
 	splits[len(splits)] = time.time()
 	ct2 = len(splits)
 	splits[ct2] = time.time()
-	print(".txt analysis duration {duration:4.3f}".format(duration=splits[ct2] - splits[ct]))
+	print(f".txt analysis duration {splits[ct2] - splits[ct]:4.3f} seconds")
 
 ct = len(splits)
 splits[ct] = time.time()
 
-print("Total Duration {duration:4.3f}".format(duration=splits[ct] - splits[0]))
+print(f"Total Duration {splits[ct] - splits[0]:4.3f} seconds")
 print("Processing complete.")
 
 #n * (n+k) * (n + 2*k) * (n+3*k) + k^4
 #= n* (n+2*k) * (n+k)*(n+3*k) + k^4
 #= (n^2+2*k*n) * (n^2 + 4*k*n + 3*k^2) + k^4
 #= (n^2*n^2 + 2*k*n*n^2) + (4*k*n*n^2 + 4*k*n*2*k*n) + (3*k^2 * n^2 + 3*k^2 * 2*k*n) +k^4
-#= n^4      + 2*k*n^3    + 4*k*n^3    + 8*k^2*n^2    +  3*k^2*n^2   + 6*k^3*n        + k^4
-#= n^4      + 6*k*n^3                 + 11*k^2n^2                   + 6*k^3*n        + k^4
+#= n^4		+ 2*k*n^3	 + 4*k*n^3	  + 8*k^2*n^2	 +	3*k^2*n^2	+ 6*k^3*n		 + k^4
+#= n^4		+ 6*k*n^3				  + 11*k^2n^2					+ 6*k^3*n		 + k^4
 #
 #(n*k + (n+k)^2)^2
 #=(n*k + n^2 + 2*k*n + k^2)^2

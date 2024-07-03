@@ -57,7 +57,7 @@ if DEBUG:
 # Windows 10 on a Core i7 running at 2.4Ghz. Memory = 32GB.
 else:
 	TEST_NODE = ""
-	START_OF_SEQUENCE_MAX = 5551				# top of range, will actually iterate n - 1
+	START_OF_SEQUENCE_MAX = 5551 # top of range, will actually iterate n - 1
 	INCREMENT_MAX = 2000
 
 # To run in a non-Windows environment, pass in a capital "B"
@@ -81,7 +81,7 @@ else:
 	DIR_CSV = WIN_DRIVE + "\\source\\PythonApps\\ProductOfFourSheet\\Output\\"
 	DIR_TXT = WIN_DRIVE + "\\source\\PythonApps\\ProductOfFourSheet\\Output\\"
 
-GENERATE_SHEET = True			# True=generate spreadsheet data, False=no spreadsheet data
+GENERATE_SHEET = False			# True=generate spreadsheet data, False=no spreadsheet data
 GENERATE_REPORT = True			# True=generate text report, False=no text report
 
 if not GENERATE_SHEET and not GENERATE_REPORT:
@@ -402,9 +402,8 @@ if GENERATE_REPORT:
 	print("Squares analysis .txt reports ")
 	ct = len(splits)
 	splits[ct] = time.time()
-	files = 0
+	fsqTXT = open(DIR_TXT + TEST_NODE+"squares.txt","w")
 	lines = 0
-	pages = 0
 	header = f"{'Number(Root)':^30}"
 	header2 = f"{'1st of four':^15}{'incr':^10}"
 	header = header + header2 * 4 + "Prime Factors"
@@ -413,12 +412,6 @@ if GENERATE_REPORT:
 	for key, val in osq.items():
 		vTXT = [FormatWithCommas(number) for number in val.copy()]
 		if lines % 45 == 0:
-			pages += 1
-			if pages % 50 == 1:
-				if pages > 1:
-					fsqTXT.close()
-				files += 1
-				fsqTXT = open(DIR_TXT + TEST_NODE+"squares"+f'{files}'+".txt","w")
 			if lines != 0:
 				print("", file=fsqTXT)
 			print(headerL, file=fsqTXT)
@@ -437,11 +430,10 @@ if GENERATE_REPORT:
 		squareNum = vTXT[0]
 		sqrt = vTXT[1]
 		vTXT2 = vTXT[2:] # slice off number and sqare root
-		ast = " "
+		ast = ""
 		lvTXT2 = len(vTXT2)
 		if not (lvTXT2 / 2) % 2 == 0:
 			ast = "*"
-     
 		appendLen = lMax + 12 - lvTXT2
 		vTXT2 = vTXT2 + ["-"] * appendLen
 
@@ -461,10 +453,10 @@ if GENERATE_REPORT:
 				inc4 = vTXT2[idx+7]
 
 				if idx == 0:
-					numSqrt = ast+"{0:^30}".format("{0}({1})".format(squareNum, sqrt))+"{0:^15}{1:^10}{2:^15}{3:^10}{4:^15}{5:^10}{6:^15}{7:^10}".format(i1Sum, inc1, i2,inc2, i3, inc3, i4, inc4)
+					numSqrt = "{0:^30}".format(ast+"{0}({1})".format(squareNum, sqrt))+"{0:^15}{1:^10}{2:^15}{3:^10}{4:^15}{5:^10}{6:^15}{7:^10}".format(i1Sum, inc1, i2,inc2, i3, inc3, i4, inc4)
 					print("{0:s}{1:s}".format(numSqrt,factors),file=fsqTXT)
 				else:
-					numSqrt = " {: <30}".format(" ")+"{0:^15}{1:^10}{2:^15}{3:^10}{4:^15}{5:^10}{6:^15}{7:^10}".format(i1Sum, inc1, i2, inc2, i3, inc3, i4,inc4)
+					numSqrt = "{: <30}".format(" ")+"{0:^15}{1:^10}{2:^15}{3:^10}{4:^15}{5:^10}{6:^15}{7:^10}".format(i1Sum, inc1, i2, inc2, i3, inc3, i4,inc4)
 					print(f"{numSqrt:s}", file=fsqTXT)
 		except IndexError:
 			print("Index out of range")

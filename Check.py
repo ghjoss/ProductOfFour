@@ -54,12 +54,8 @@ foundDict = {}
 fileDict = {}
 byFile = [dict() for x in range(fileCount+1)]
 
-if bash:
-	r = re.compile(".+\\((?P<Factors>(?:\d+\s*[x]?\s*)+)\\)")
-else:
-	lparen = "("
-	rparen = ")"
-	r = re.compile(".*\\"+lparen+"(?P<Factors>.*)\\"+rparen)
+r = re.compile(r".+\((?P<Factors>(?:\d+\s*[x]?\s*)+)\)")
+
 for w in _100KPrimes.primes:
 	foundDict[str(w)] = False
 
@@ -93,7 +89,7 @@ for fileNo in range(1,fileCount + 1):
 		if m != None:
 			factors = m.group("Factors")
 			factors = factors.replace(multSign," ")
-			wordList = re.sub("[^\\w]"," ",factors).split()
+			wordList = re.sub(r"[^\w]"," ",factors).split()
 
 			for pr in wordList:
 				if pr in foundDict:

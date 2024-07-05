@@ -58,7 +58,7 @@ if DEBUG:
 else:
 	TEST_NODE = ""
 	START_OF_SEQUENCE_MAX = 5551				# top of range, will actually iterate n - 1
-	INCREMENT_MAX = 2000
+	INCREMENT_MAX = 2001
 
 # To run in a non-Windows environment, pass in a capital "B"
 arg2 = sys.argv[2].lower() if len(sys.argv) > 2 else "W"
@@ -82,12 +82,19 @@ else:
 	DIR_TXT = WIN_DRIVE + "\\source\\PythonApps\\ProductOfFourSheet\\Output\\"
 
 GENERATE_SHEET = True			# True=generate spreadsheet data, False=no spreadsheet data
+GENERATE_INCREMENT_OUTPUT = True
+GENERATE_SQUARES_OUTPUT = True
 GENERATE_REPORT = True			# True=generate text report, False=no text report
+MAX_INCREMENT_FILES = 50		# number of INC_... files to write (one each of .csv and .txt)
+if MAX_INCREMENT_FILES == "ALL":
+	MAX_INCREMENT_FILES = INCREMENT_MAX # write all of them
 
 if not GENERATE_SHEET and not GENERATE_REPORT:
 	print("Must run to generate either sheet or text report or both, but not neither.")
 	exit()
-
+if not GENERATE_INCREMENT_OUTPUT and not GENERATE_SQUARES_OUTPUT:
+	print("Must run to generate either increment files ("+TEST_NODE+"Inc_...) and/or squares analysis files ("+TEST_NODE+"Squares_...)")
+	exit()
 # Prime lists, _100KPrimes or _50KPrimes
 sys.path.append('.')
 import _100KPrimes				#100,000 prime numbers in a list named "primes"
@@ -104,9 +111,9 @@ for w in _100KPrimes.primes:
 squaresDict = {}			# dictionary of lists of the generated squares and square roots. Key = square number
 factorsList = []			# list of the prime factors of the square roots
 factorsDict = {}			# dictionary of lists of the prime factors of the square roots
-
+INCREMENTS_LINES_PER_PAGE = 50
 if GENERATE_REPORT:
-	HEADER_TXT = "{0:>8}{1:^30}num**0.5(factors)".format("i","num")
+	HEADER_TXT = "{0:<8}{1:^30}num^0.5(factors)".format("n","num")
 	HEADER_LTXT = "-" * 72
 
 # the difference between successive integers in the product of four integers is represented by the
@@ -121,11 +128,11 @@ for increment in range(1,INCREMENT_MAX):
 
 	# for this increment, determine and print the headers.
 	HEADER_0 = "increment == {0:d}".format(increment)
-	HEADER_1 = "num == (i x (i+{0:d}) x (i+{1:d}) x (i+{2:d}) + {3:d})".format(increment,2*increment,3*increment,inc4) + " -or-	 num == (i x {0:d} + (i + {0:d})²)²".format(increment)
+	HEADER_1 = "num == (n x (n+{0:d}) x (n+{1:d}) x (n+{2:d}) + {3:d})".format(increment,2*increment,3*increment,inc4) + " -or-	 num == (n x {0:d} + (n + {0:d})²)²".format(increment)
 
 	# headers for .CSV file (spreadsheet)
-	if GENERATE_SHEET:
-		HDR_1 = ["i","num","sq.Root"]
+	if GENERATE_SHEET and GENERATE_INCREMENT_OUTPUT and increment <= MAX_INCREMENT_FILES:
+		HDR_1 = ["n","num","sqrt(num)"]
 		HDR_2 = "factor"
 		HEADER_CSV = HDR_1 + [HDR_2]*13 + ["increment=="+"{0:d}".format(increment)]
 		# open the report for output
@@ -138,7 +145,8 @@ for increment in range(1,INCREMENT_MAX):
 		maxRootFactor = 0
 		maxNum = 0
 
-		fTXT = open(DIR_TXT + TEST_NODE+'Inc_'+str(increment)+'.txt', 'w') # for running on laptop machine
+		if GENERATE_INCREMENT_OUTPUT and increment <= MAX_INCREMENT_FILES:
+			fTXT = open(DIR_TXT + TEST_NODE+'Inc_'+str(increment)+'.txt', 'w') # for running on laptop machine
 
 	# loop through the first "startOfSequenceMax" integers, calculating the product of four integers that are
 	# in an arithmetic sequencce separated by the current increment
@@ -147,15 +155,15 @@ for increment in range(1,INCREMENT_MAX):
 	for startInteger in range(1,START_OF_SEQUENCE_MAX):
 		factorsList = []
 		# the text file output header is printed every 45 lines.
-		if GENERATE_REPORT:
-			if startInteger % 45 == 1:
+		if GENERATE_REPORT and GENERATE_INCREMENT_OUTPUT and increment <= MAX_INCREMENT_FILES:
+			if startInteger % INCREMENTS_LINES_PER_PAGE == 1:
 					if startInteger > 1:
-						print("",file=fTXT)
-					print(HEADER_LTXT,file=fTXT)
-					print(HEADER_0,file=fTXT)
-					print(HEADER_1,file=fTXT)
-					print(HEADER_TXT,file=fTXT)
-					print(HEADER_LTXT,file=fTXT)
+						print("", file=fTXT)
+					print(HEADER_LTXT, file=fTXT)
+					print(HEADER_0, file=fTXT)
+					print(HEADER_1, file=fTXT)
+					print(HEADER_TXT, file=fTXT)
+					print(HEADER_LTXT, file=fTXT)
 
 		# squareNum = i * (i + increment) * (i + 2*increment) * (i + 3*increment) + increment**4
 		# factorizationTestNum = sqrtNum = num ** 0.5
@@ -225,7 +233,7 @@ for increment in range(1,INCREMENT_MAX):
 						j = j + 1
 				#end 'while j < len(primes) and breakJ == 0
 
-		if GENERATE_SHEET:
+		if GENERATE_SHEET and GENERATE_INCREMENT_OUTPUT and increment == MAX_INCREMENT_FILES:
 			csvRow = [startInteger, squareNum, sqrtNum] + factorsList
 			writer.writerow([FormatWithCommas(number) for number in csvRow])
 
@@ -241,10 +249,12 @@ for increment in range(1,INCREMENT_MAX):
 				else:
 					factors += wordC
 
-			startIntegerT = FormatWithCommas(startInteger)
-			squareNumT = FormatWithCommas(squareNum)
-			sqrtNumT = FormatWithCommas(sqrtNum)
-			print(f'{startIntegerT:8}{squareNumT:^30}{sqrtNumT:^}({factors})',file=fTXT)
+			
+			if GENERATE_INCREMENT_OUTPUT and increment <= MAX_INCREMENT_FILES:
+				startIntegerT = FormatWithCommas(startInteger)
+				squareNumT = FormatWithCommas(squareNum)
+				sqrtNumT = FormatWithCommas(sqrtNum)
+				print(f'{startIntegerT:8}{squareNumT:^30}{sqrtNumT:^}({factors})', file=fTXT)
 
 		if squareNum not in factorsDict:
 			factorsDict[squareNum] = factorsList
@@ -257,70 +267,71 @@ for increment in range(1,INCREMENT_MAX):
 				print(f"{startInteger} products analyzed")
 
 	if GENERATE_REPORT:
-		print(f"There are {primeRoots:d} prime square roots out of {START_OF_SEQUENCE_MAX - 1:d} calculations.", file=fTXT)
-		print(f"Maximum prime factor: {maxRootFactor:.0f} (at test for {maxNum:.0f})", file=fTXT)
+		if GENERATE_INCREMENT_OUTPUT and increment <= MAX_INCREMENT_FILES:
+			print(f"There are {primeRoots:d} prime square roots out of {START_OF_SEQUENCE_MAX - 1:d} calculations.", file=fTXT)
+			print(f"Maximum prime factor: {maxRootFactor:.0f} (at test for {maxNum:.0f})", file=fTXT)
 
-		if increment % 2 == 1:
-			moduloMidpoint = (increment - 1) / 2
-			incrementIsOdd = True
-		else:
-			moduloMidpoint = increment / 2
-			incrementIsOdd = False
-
-		moduloPrint = ""
-		moduloPrintHeader = "Calculated number modulo " + str(increment) + " cycle: "
-		moduloPrintHeaderLen = len(moduloPrintHeader)
-		rightAst = ""
-		for offset, m in enumerate(numModList, start=1):
-			if offset == moduloMidpoint:
-				if incrementIsOdd:
-					strM = ('* ' + str(m)).rjust(11)
-					rightAst = " *"
-				else:
-					strM = ("* " + str(m) + " *").rjust(11)
+			if increment % 2 == 1:
+				moduloMidpoint = (increment - 1) / 2
+				incrementIsOdd = True
 			else:
-				strM = (str(m) + rightAst).rjust(11)
-				rightAst = ""
+				moduloMidpoint = increment / 2
+				incrementIsOdd = False
 
-			moduloPrint = moduloPrint + strM
-			if len(moduloPrint) >= 110 and increment != 1:
-				print(moduloPrintHeader + moduloPrint, file=fTXT)
-				moduloPrintHeader = " " * moduloPrintHeaderLen
-				moduloPrint = ""
-
-		if moduloPrint != "" and increment != 1:
-			print(moduloPrintHeader + moduloPrint, file=fTXT)
-		
-		rightAst = ""
-		moduloPrint = ""
-		# pad print header to be as long as the prior header
-		moduloPrintHeader = ("Square root modulo " + str(increment) + " cycle: ").ljust(moduloPrintHeaderLen)
-
-		rightAst = ""
-		for offset, m in enumerate(sqrtModList, start=1):
-			if offset == moduloMidpoint:
-				if incrementIsOdd:
-					strM = ('* ' + str(m)).rjust(11)
-					rightAst = " *"
+			moduloPrint = ""
+			moduloPrintHeader = "Calculated number modulo " + str(increment) + " cycle: "
+			moduloPrintHeaderLen = len(moduloPrintHeader)
+			rightAst = ""
+			for offset, m in enumerate(numModList, start=1):
+				if offset == moduloMidpoint:
+					if incrementIsOdd:
+						strM = ('* ' + str(m)).rjust(11)
+						rightAst = " *"
+					else:
+						strM = ("* " + str(m) + " *").rjust(11)
 				else:
-					strM = ("* " + str(m) + " *").rjust(11)
-			else:
-				strM = (str(m) + rightAst).rjust(11)
-				rightAst = ""
+					strM = (str(m) + rightAst).rjust(11)
+					rightAst = ""
 
-			moduloPrint = moduloPrint + strM
-			if len(moduloPrint) >= 110 and increment != 1:
+				moduloPrint = moduloPrint + strM
+				if len(moduloPrint) >= 110 and increment != 1:
+					print(moduloPrintHeader + moduloPrint, file=fTXT)
+					moduloPrintHeader = " " * moduloPrintHeaderLen
+					moduloPrint = ""
+
+			if moduloPrint != "" and increment != 1:
 				print(moduloPrintHeader + moduloPrint, file=fTXT)
-				moduloPrintHeader = " " * moduloPrintHeaderLen
-				moduloPrint = ""
+			
+			rightAst = ""
+			moduloPrint = ""
+			# pad print header to be as long as the prior header
+			moduloPrintHeader = ("Square root modulo " + str(increment) + " cycle: ").ljust(moduloPrintHeaderLen)
 
-		if moduloPrint != "" and increment != 1:
-			print(moduloPrintHeader + moduloPrint, file=fTXT)
+			rightAst = ""
+			for offset, m in enumerate(sqrtModList, start=1):
+				if offset == moduloMidpoint:
+					if incrementIsOdd:
+						strM = ('* ' + str(m)).rjust(11)
+						rightAst = " *"
+					else:
+						strM = ("* " + str(m) + " *").rjust(11)
+				else:
+					strM = (str(m) + rightAst).rjust(11)
+					rightAst = ""
+
+				moduloPrint = moduloPrint + strM
+				if len(moduloPrint) >= 110 and increment != 1:
+					print(moduloPrintHeader + moduloPrint, file=fTXT)
+					moduloPrintHeader = " " * moduloPrintHeaderLen
+					moduloPrint = ""
+
+			if moduloPrint != "" and increment != 1:
+				print(moduloPrintHeader + moduloPrint, file=fTXT)
 
 
-	if GENERATE_SHEET:
+	if GENERATE_SHEET and GENERATE_INCREMENT_OUTPUT and increment <= MAX_INCREMENT_FILES:
 		fCSV.close()
-	if GENERATE_REPORT:
+	if GENERATE_REPORT and GENERATE_INCREMENT_OUTPUT and increment <= MAX_INCREMENT_FILES:
 		fTXT.close()
 
 	ct = len(splits)
@@ -328,40 +339,51 @@ for increment in range(1,INCREMENT_MAX):
 	print(f"Processing complete for increment {increment:d}, duration {(splits[ct] - splits[ct-1]):4.3f}")
 #end 'for increment in range(1,...'
 
-#
-# Each calculated square number was added as a key to a dictionary (squaresDict). That dictionary keeps track of all the
-# four number arithmetic sequences and the difference between consecutive numbers in that sequence.
-# So, for instance, the number 43681 (209 * 209) is generated by:
-#	13 * 14 * 15 * 16 + 1	(start = 13,diff = 1: 1**4)
-#	8 * 13 * 18 * 23 + 625	(start = 8, diff = 5: 5**4)
-#	5 * 13 * 21 * 29 + 4096 (start = 5, diff = 8: 8**4)
-#	1 * 14 * 27 * 40 + 28561 (start = 1, diff = 13: 13 ** 4)
-# Thus the dictionary entry for 43681 is: 43681,209,13,1,8,5,5,8,1,13
-#
-print("Multiple starting integer/increment pairs generate the same square number. Iterate over the")
-print("squaresDict collection to find these sequences/increment pairs.")
-# "e.g.: 43861 == 209*209 
-# == 13*14*15*16+1 
-# == 8*13*18*23+625 (5^4) 
-# == 5*13*21*29+512 (8^4) 
-# == 1 * 14 * 27 * 40 + 28561 (13^4)")
+if GENERATE_SQUARES_OUTPUT:
+	#
+	# Each calculated square number was added as a key to a dictionary (squaresDict). That dictionary keeps track of all the
+	# four number arithmetic sequences and the difference between consecutive numbers in that sequence.
+	# So, for instance, the number 43681 (209 * 209) is generated by:
+	#	13 * 14 * 15 * 16 + 1	(start = 13,diff = 1: 1**4)
+	#	8 * 13 * 18 * 23 + 625	(start = 8, diff = 5: 5**4)
+	#	5 * 13 * 21 * 29 + 4096 (start = 5, diff = 8: 8**4)
+	#	1 * 14 * 27 * 40 + 28561 (start = 1, diff = 13: 13 ** 4)
+	# Thus the dictionary entry for 43681 is: 43681,209,13,1,8,5,5,8,1,13
+	#
+	print("Multiple starting integer/increment pairs generate the same square number. Iterate over the")
+	print("squaresDict collection to find these sequences/increment pairs.")
+	# "e.g.: 43861 == 209*209 
+	# == 13*14*15*16+1 
+	# == 8*13*18*23+625 (5^4) 
+	# == 5*13*21*29+512 (8^4) 
+	# == 1 * 14 * 27 * 40 + 28561 (13^4)")
 osq = collections.OrderedDict(sorted(squaresDict.items())) #osq: o_rdered sq_uares dictionary
 osqCt = 0
 lMax = -1
 
+oddSequences = {}
 with open(DIR_TXT+TEST_NODE+"bigdictionary.txt","w") as bdo:
 	for o in osq:
 		listLen = int((len(osq[o]) - 2))
+		listLenHalf = listLen / 2
+		if not listLenHalf % 2 == 0:
+			oddSequence = osq[o][2:]
+			if oddSequence[0] == oddSequence[-1]:
+				oddSeqKey = str(osq[o][0])+"("+str(osq[o][1])+")"
+				oddSequences[oddSeqKey] = oddSequence
 		print(listLen, ":", osq[o][:2], osq[o][2:], file=bdo)
 		osqCt += 1
 		if listLen > lMax:
 			lMax = listLen
-	print(f"Max length of dictionary entries: {lMax:d}", file=bdo)
+	print(f"\nMax length of dictionary entries: {lMax:d}", file=bdo)
+	print('\nReport of sequences with an odd number of n/k pairs:\n', file=bdo)
+	for k,v in oddSequences.items():
+		print(f'{k}: {v}', file=bdo)
 
-if osqCt == 0:
-	print("No data",file=bdo)
+	if osqCt == 0:
+		print("No data", file=bdo)
 
-if GENERATE_SHEET:
+if GENERATE_SHEET and GENERATE_SQUARES_OUTPUT:
 	print("Squares analysis .csv sheets")
 	ct = len(splits)
 	splits[ct] = time.time()		 
@@ -380,7 +402,9 @@ if GENERATE_SHEET:
 		if outputLineCount % 250000 == 1:
 			if outputLineCount != 1:
 				fsqCSV.close()
-			fsqCSV = open(DIR_CSV + TEST_NODE+"squares_"+str(fileNo)+".csv","w",newline='')
+			fName = TEST_NODE+"squares_"+str(fileNo)+".csv"
+			print(f"Processing {fName}")
+			fsqCSV = open(DIR_CSV + fName,"w",newline='')
 			writer = csv.writer(fsqCSV)
 			writer.writerow(fullHdr)
 			fileNo += 1
@@ -397,14 +421,19 @@ if GENERATE_SHEET:
 	fsqCSV.close()
 	print(f".csv analysis duration {splits[ct2] - splits[ct]:4.3f} seconds")
 
-
-if GENERATE_REPORT:
+if GENERATE_REPORT and GENERATE_SQUARES_OUTPUT:
 	print("Squares analysis .txt reports ")
+	oddSeqMax = -1
 	ct = len(splits)
 	splits[ct] = time.time()
 	files = 0
 	lines = 0
 	pages = 0
+	# after this many pages, squaresN.txt is closed and a new file is created
+	# (N=1,2,3,...)
+	PAGES_PER_FILE = 250
+	# number of data lines before printing a new set of headers
+	SQUARES_LINES_PER_PAGE = 50 
 	header = f"{'Number(Root)':^30}"
 	header2 = f"{'1st of four':^15}{'incr':^10}"
 	header = header + header2 * 4 + "Prime Factors"
@@ -412,13 +441,15 @@ if GENERATE_REPORT:
 
 	for key, val in osq.items():
 		vTXT = [FormatWithCommas(number) for number in val.copy()]
-		if lines % 45 == 0:
+		if lines % SQUARES_LINES_PER_PAGE == 0:
 			pages += 1
-			if pages % 50 == 1:
+			if pages % PAGES_PER_FILE == 1:
 				if pages > 1:
 					fsqTXT.close()
 				files += 1
-				fsqTXT = open(DIR_TXT + TEST_NODE+"squares"+f'{files}'+".txt","w")
+				fName = TEST_NODE+"squares"+f'{files}'+".txt"
+				print(f"Processing {fName}")
+				fsqTXT = open(DIR_TXT + fName,"w")
 			if lines != 0:
 				print("", file=fsqTXT)
 			print(headerL, file=fsqTXT)
@@ -438,12 +469,18 @@ if GENERATE_REPORT:
 		sqrt = vTXT[1]
 		vTXT2 = vTXT[2:] # slice off number and sqare root
 		ast = " "
-		lvTXT2 = len(vTXT2)
-		if not (lvTXT2 / 2) % 2 == 0:
+		lvTXT2 = len(vTXT2) / 2
+		if not lvTXT2 % 2 == 0: # not lvTXT2 % 4 == 0?
 			ast = "*"
-     
-		appendLen = lMax + 12 - lvTXT2
-		vTXT2 = vTXT2 + ["-"] * appendLen
+			if lvTXT2 > oddSeqMax:
+				if vTXT2[0] == vTXT2[-1]:
+					oddSeqMax = lvTXT2
+					oddSeqMaxNum = squareNum
+					oddSeqMaxSqrt = sqrt
+					oddSequence = vTXT2
+		
+#		appendLen = lMax + 12 - lvTXT2
+		vTXT2 = vTXT2 + ["-"] * 16 #appendlen
 
 		try:
 			for idx, val in enumerate(vTXT2):
@@ -479,7 +516,6 @@ if GENERATE_REPORT:
 
 ct = len(splits)
 splits[ct] = time.time()
-
 print(f"Total Duration {splits[ct] - splits[0]:4.3f} seconds")
 print("Processing complete.")
 

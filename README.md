@@ -196,11 +196,11 @@ Notes:
 
 	o	Question: is there any way to predetermine which generated numbers have an odd number of n:k,k:n combinations greater than 1?
 	
+	o	for n=k, the square root of generated product (s) is 5 * n^2. Proof: By formula 2, s=n*k + (n+k)^2). For k=n this becomes n^2 + (2*n)^2 = n^2 + 4*n^2 = 5 * n^2
+
 	o	for n=k the product's square root is 5 n^2.  For n-1:k+1 and n+1:k-1 the product's square root is 5*n^2 - 1.  Proof: for k=n, n-1:k+1 = n-1:n+1. Again using Formula 2,
 		the square root of the product is (n-1)*(n+1) + (n-1 + n + 1)^2 = n^2 - 1 + (2*n)^2 = 5*n^2 - 1 
 	
-	o	for n=k, the square root of generated product (s) is 5 * n^2. Proof: By formula 2, s=n*k + (n+k)^2). For k=n this becomes n^2 + (2*n)^2 = n^2 + 4*n^2 = 5 * n^2
-
 	o	For every n=x,k=y pair that generates a number, there exists an n=y,k=x pair that generates the same number. Proof: Using Formula 2 (n*k + (n+k)^2)^2 for the sequence 
 		it is easy to see that swapping n and k does not change the result. This shows that whenever a set of n:k combinations has an odd number of entries, then one of those entries must 
 		be where n=k.

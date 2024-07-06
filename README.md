@@ -58,7 +58,7 @@ factors of the square roots:
 	o	PrimesInFiles.txt: this is summarized by the files Inc_1.txt - Inc_1200.txt. Whenever a prime factor is noted in a file, if it is the
 		first time that prime factor has been seen, then it is associated with that file along with the line number where it occured.
 		
-			d:\Source\PythonApps\ProductOfFourSheet\Output\Inc_1.txt
+			d:\Source\PythonApps\ProductOfFourSheet\Pof4_Output\Inc_1.txt
 			  5(@6)          11(@7)         19(@8)         29(@9)         41(@10)        71(@12)        89(@13)        
 			  109(@14)       131(@15)       31(@16)        181(@17)       239(@19)       271(@20)       61(@21)        
 			  379(@23)       419(@24)       461(@25)       101(@26)       599(@28)       59(@29)        701(@30)
@@ -67,7 +67,7 @@ factors of the square roots:
 		numbers include the five header lines (see above) which are repeated every 45 lines. Note that this is ordered by the line number.
 	o 	PrimesInFilesSorted.txt: this is similar to the PrimesInFiles.txt file, but is sorted by the prime factors.
 	
-			d:\Source\PythonApps\ProductOfFourSheet\Output\Inc_1.txt
+			d:\Source\PythonApps\ProductOfFourSheet\Pof4_Output\Inc_1.txt
 			  5(@6)          11(@7)         19(@8)         29(@9)         31(@16)        41(@10)        59(@29)        
 			  61(@21)        71(@12)        79(@33)        89(@13)        101(@26)       109(@14)       131(@15)       
 			  139(@73)       149(@44)       151(@31)       179(@84)       181(@17)       191(@98)       199(@71)       
@@ -139,6 +139,15 @@ sequences:
 				...
 
 Notes:
+	o	ProductOfFour.py will write to the Pof4_Output subdirectory. This subdirectory will be 
+		within the directory where the ProductOfFour.py program exists. If the subdirectory
+		does not exist it will be created.
+		
+		The directory name within the program will be valid for both linux and MS-windows.
+	o	In the notes that follow, the resultant number is referred to as the product, when
+		in the definition of the original sequence it is actually the sum of a 4 number product
+		and a 4th power of an integer.
+
 	o	The math involved:
 
 		For number n, difference (increment) k:
@@ -195,7 +204,8 @@ Notes:
 		was 2000.
 
 	o	Question: is there any way to predetermine which generated numbers have an odd number of n:k,k:n combinations greater than 1?
-	
+																															
+ 
 	o	for n=k, the square root of generated product (s) is 5 * n^2. Proof: By formula 2, s=n*k + (n+k)^2). For k=n this becomes n^2 + (2*n)^2 = n^2 + 4*n^2 = 5 * n^2
 
 	o	for n=k the product's square root is 5 n^2.  For n-1:k+1 and n+1:k-1 the product's square root is 5*n^2 - 1.  Proof: for k=n, n-1:k+1 = n-1:n+1. Again using Formula 2,

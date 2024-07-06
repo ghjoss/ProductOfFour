@@ -21,6 +21,8 @@
 	For increment=5 through increment=25, no sequences were found referencing the
 	square roots.
 """
+import os
+import errno
 import sys
 import collections
 import time
@@ -30,11 +32,14 @@ import csv
 # a thousands, millions, ... ',' separator.
 ADD_THOUSANDS_SEPARATOR = True
 
+def is_numeric(var):
+	""" checks if a variable is numeric type using isinstance."""
+	return isinstance(var, (int, float, complex))
+
 # Function to format numbers with comma separators
-
-
 def FormatWithCommas(num:int):
 	return f'{num:,}' if ADD_THOUSANDS_SEPARATOR else str(num)
+
 
 
 splits = {}
@@ -60,33 +65,25 @@ else:
 	START_OF_SEQUENCE_MAX = 5551				# top of range, will actually iterate n - 1
 	INCREMENT_MAX = 2001
 
-# To run in a non-Windows environment, pass in a capital "B"
-arg2 = sys.argv[2].lower() if len(sys.argv) > 2 else "W"
-BASH = True if arg2.startswith("b") else False
-# bash==False: The program is on windows a drive whose letter is defined in variable 'drive' as accessed from win10
-# bash==True: program is running on Linux
-#
-# Whether running in Linux or Windows, directory names must end with a directory specification separator
-# (/ for linux, \ for ms Windows). Otherwise the final node will be treated as a file name prefix.
-# Note the defaults below assume either native windowns python app or a Windows SUbsystem for Linux (WSL)
-# python app. Set your directories to match your own environment (native Linux or Mac).
+# get working directory of this python program, add
+# an Output subdirectory (if necessary).
+OUTPUT_DIR = os.path.dirname(__file__) + "/Pof4_Output"
+try:
+	os.mkdir(OUTPUT_DIR)
+except OSError as error:
+	if not error.errno == errno.EEXIST:
+		print(f"Failed to create: {OUTPUT_DIR}")
+		exit()
 
-DRIVE = "d"
-if BASH:
-	DIR_CSV = "/mnt/" + DRIVE + "/source/PythonApps/ProductOfFourSheet/Output/"
-	DIR_TXT = "/mnt/d/source/PythonApps/ProductOfFourSheet/Output/"
-else:
-	# assumes Debian or ubuntu running in WSL (Windows Subystem for Linux)
-	WIN_DRIVE = DRIVE + ":"	 # the windows drive for the output files
-	DIR_CSV = WIN_DRIVE + "\\source\\PythonApps\\ProductOfFourSheet\\Output\\"
-	DIR_TXT = WIN_DRIVE + "\\source\\PythonApps\\ProductOfFourSheet\\Output\\"
-
+DIR_CSV = OUTPUT_DIR + "/"
+DIR_TXT = OUTPUT_DIR + "/"
 GENERATE_SHEET = True			# True=generate spreadsheet data, False=no spreadsheet data
 GENERATE_INCREMENT_OUTPUT = True
 GENERATE_SQUARES_OUTPUT = True
 GENERATE_REPORT = True			# True=generate text report, False=no text report
 MAX_INCREMENT_FILES = 50		# number of INC_... files to write (one each of .csv and .txt)
-if MAX_INCREMENT_FILES == "ALL":
+
+if not is_numeric(MAX_INCREMENT_FILES):
 	MAX_INCREMENT_FILES = INCREMENT_MAX # write all of them
 
 if not GENERATE_SHEET and not GENERATE_REPORT:

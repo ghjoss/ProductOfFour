@@ -114,8 +114,8 @@ if GENERATE_REPORT:
 	HEADER_LTXT = "-" * 72
 
 # the difference between successive integers in the product of four integers is represented by the
-# variable 'increment'. These increments will be iterated from 1 through incrementMax. The program will 
-# calculate 'startOfSequenceMax' products for each difference.
+# variable 'increment'. These increments will be iterated from 1 through INCREMENT_MAX. The program will 
+# calculate START_OF_SEQUENCE_MAX products for each difference.
 for increment in range(1,INCREMENT_MAX):
 	# to the product of four integers separated by 'increment' will be added increment to the 4th power
 	# this will make the product + the 4th power of increment a perfect square integer.
@@ -511,23 +511,23 @@ print(f"Total Duration {splits[ct] - splits[0]:4.3f} seconds")
 print("Processing complete.")
 
 #n * (n+k) * (n + 2*k) * (n+3*k) + k^4
-#= n* (n+2*k) * (n+k)*(n+3*k) + k^4
-#= (n^2+2*k*n) * (n^2 + 4*k*n + 3*k^2) + k^4
-#= (n^2*n^2 + 2*k*n*n^2) + (4*k*n*n^2 + 4*k*n*2*k*n) + (3*k^2 * n^2 + 3*k^2 * 2*k*n) +k^4
-#= n^4		+ 2*k*n^3	 + 4*k*n^3	  + 8*k^2*n^2	 +	3*k^2*n^2	+ 6*k^3*n		 + k^4
-#= n^4		+ 6*k*n^3				  + 11*k^2n^2					+ 6*k^3*n		 + k^4
+# =n* (n+2*k) * (n+k)*(n+3*k) + k^4
+# =(n^2+2*k*n) * (n^2 + 4*k*n + 3*k^2) + k^4
+# =(n^2*n^2 + 2*k*n*n^2) + (4*k*n*n^2 + 4*k*n*2*k*n) + (3*k^2 * n^2 + 3*k^2 * 2*k*n) +k^4
+# =n^4		+ 2*k*n^3	 + 4*k*n^3	  + 8*k^2*n^2	 +	3*k^2*n^2	+ 6*k^3*n		 + k^4
+# =n^4		+ 6*k*n^3				  + 11*k^2n^2					+ 6*k^3*n		 + k^4
 #
-#(n*k + (n+k)^2)^2
-#=(n*k + n^2 + 2*k*n + k^2)^2
-#=(n*k + n^2 + 2*k*n + k^2) * (n*k + n^2 + 2*k*n + k^2)
-#= (n*k*n*k + n^2*n*k + 2*k*n*n*k + k^2*n*k) + (n*k*n^2 + n^2*n^2 + 2*k*n*n^2 + k^2*n^2) + (n*k*2*k*n + n^2*2*k*n + 2*k*n*2*k*n + k^2*2*k*n) + (n*k*k^2 + n^2*k^2 + 2*k*n*k^2) + (k^2*k^2)
-#= (k^2*n^2 + k*n^3 + 2*k^2*n^2 + k^3*n) + (k*n^3 + n^4 + 2*k*n^3 + k^2*n^2) + (2*k^2*n^2 + 2*k*n^3 + 4*k^2*n^2 + 2*k^3*n) + (k^3*n + k^2*n^2 + 2*k^3*n + k^4)
-#= n^4 + (k*n^3 + k*n^3 + 2*k*n^3 + 2*k*n^3) + (k^2n^2 + 2*k^2*n^2 + k^2*n^2 + 2*k^2*n^2 + 4*k^2*n^2 + k^2*n^2) + (k^3*n + 2*k^3*n + k^*n + 2*k^3*n) + k^4
-#= n^4 + 6*k*n^3 + 11*k^2n^2 + 6*k^3*n + k^4
+# (n*k + (n+k)^2)^2
+# =(n*k + n^2 + 2*k*n + k^2)^2
+# =(n*k + n^2 + 2*k*n + k^2) * (n*k + n^2 + 2*k*n + k^2)
+# =(n*k*n*k + n^2*n*k + 2*k*n*n*k + k^2*n*k) + (n*k*n^2 + n^2*n^2 + 2*k*n*n^2 + k^2*n^2) + (n*k*2*k*n + n^2*2*k*n + 2*k*n*2*k*n + k^2*2*k*n) + (n*k*k^2 + n^2*k^2 + 2*k*n*k^2) + (k^2*k^2)
+# =(k^2*n^2 + k*n^3 + 2*k^2*n^2 + k^3*n) + (k*n^3 + n^4 + 2*k*n^3 + k^2*n^2) + (2*k^2*n^2 + 2*k*n^3 + 4*k^2*n^2 + 2*k^3*n) + (k^3*n + k^2*n^2 + 2*k^3*n + k^4)
+# =n^4 + (k*n^3 + k*n^3 + 2*k*n^3 + 2*k*n^3) + (k^2n^2 + 2*k^2*n^2 + k^2*n^2 + 2*k^2*n^2 + 4*k^2*n^2 + k^2*n^2) + (k^3*n + 2*k^3*n + k^*n + 2*k^3*n) + k^4
+# =n^4 + 6*k*n^3 + 11*k^2n^2 + 6*k^3*n + k^4
 #
-#(n^2 + 3*k*n + k^2)^2
-#(n^2 + 3*k*n + k^2) * (n^2 + 3*k*n + k^2)
-#n^4 + 3*k*n^3 + n^2*k^2 + 3*k*n^3 + 9*k^2*n^2 + 3*k^3*n + k^2+n^2 + 3*k^3*n + k^4
-#n^4 + (3*k*n^3 + 3*k*n^3) + (n^2*k^2+9*k^2*n^2) + (3*k^3*n + 3*k^3*n) + k^4
-#n^4 + 6*k*n^3 + 11*k^2*n^2 + 6*k^3*n + k^4
+# (n^2 + 3*k*n + k^2)^2
+# =(n^2 + 3*k*n + k^2) * (n^2 + 3*k*n + k^2)
+# =n^4 + 3*k*n^3 + n^2*k^2 + 3*k*n^3 + 9*k^2*n^2 + 3*k^3*n + k^2+n^2 + 3*k^3*n + k^4
+# =n^4 + (3*k*n^3 + 3*k*n^3) + (n^2*k^2+9*k^2*n^2) + (3*k^3*n + 3*k^3*n) + k^4
+# =n^4 + 6*k*n^3 + 11*k^2*n^2 + 6*k^3*n + k^4
 #

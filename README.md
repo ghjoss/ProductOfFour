@@ -220,4 +220,13 @@ Notes:
 
 	o	for n=x,k=3: no product has a prime factor of 2. Proof: (P) is even. Adding 81 makes the result odd. Odd numbers do not have 2 as a prime factor.
 
+	o	Conjecture: In the Inc_1.txt file, note the first [1], second [2] and third [3] time a prime factor (pf) appears for a result (R). Note n[1],n[2] and n[3].
+					The next time that (pf) will appear will be at n[4] = n[3] + (n[2]-n[1]). n[5] = n[4] + (n[3] - n[2]). This repeats infinitely for each first
+					occurence of a prime factor (pf).
+					examples: 	(pf)=11:  n[1]=2, n[2]=6, n[3]=13.  n[4]=13 + (6-2)  = 17. n[5] = 17 + (13-6)  = 24.  n[6] = 24 + (17-13) = 28, ...
+								(pf)=19:  n[1]=3, n[2]=13,n[3]=22.  n[4]=22 + (13-3) = 32. n[5] = 32 + (22-13) = 41.  n[6] = 41 + (32-22) = 51, ...
+								(pf)=29:  n[1]=4, n[2]=22,n[3]=33.  n[4]=33 + (22-4) = 51. n[5] = 51 + (33-22) = 62.  n[6] = 62 + (51-33) = 80, ...
+					The difference of n[m]-n[m-2] = (pf) for m >= 3.
+
+
 

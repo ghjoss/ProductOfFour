@@ -466,15 +466,9 @@ if GENERATE_REPORT and GENERATE_SQUARES_OUTPUT:
 		sqrt = vTXT[1]
 		vTXT2 = vTXT[2:] # slice off number and sqare root
 		ast = " "
-		lvTXT2 = len(vTXT2) / 2
-		if not lvTXT2 % 2 == 0: # not lvTXT2 % 4 == 0?
-			ast = "*"
-			if lvTXT2 > oddSeqMax:
-				if vTXT2[0] == vTXT2[-1]:
-					oddSeqMax = lvTXT2
-					oddSeqMaxNum = squareNum
-					oddSeqMaxSqrt = sqrt
-					oddSequence = vTXT2
+		if not len(vTXT2)  % 4 == 0:
+			if vTXT2[0] == vTXT2[-1]: # only set * if we have a complete set of n/k
+				ast = "*"
 		
 #		appendLen = lMax + 12 - lvTXT2
 		vTXT2 = vTXT2 + ["-"] * 16 #appendlen

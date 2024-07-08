@@ -1,4 +1,4 @@
-The product (P) of four integers in a consecutive aritmetic sequence (difference = "increment")
+The product π of four integers in a consecutive aritmetic sequence (difference = "increment")
 added to the increment integer value raised to the fourth power is always a squared integer
 value. As an example:
 sequence 2 4 6 8  (increment = 2): 2 * 4 * 6 * 8 + 2^4 = 384 + 16 = 400
@@ -14,10 +14,10 @@ code to evaluate the square roots without having to use the sqrt() function.
 The comments in A062938 note the general formula for this equation: 
 	n * (n+k) * (n+2k) * (n+3k) + k^4 is a perfect square.
 
-For increment=1: The square roots of the results are the values in sequence #A028387. 
-For increment=2: The square roots of the results are the positive values in sequence #A028875
-For increment=3: The square roots of the results are the positive values in sequence #A190576
-For increment=4: The square roots of the results are the positive values in sequence #A134594
+For increment=1: The square roots of the results are the values in sequence https://oeis.org/A028387. 
+For increment=2: The square roots of the results are the positive values in sequence https://oeis.org/A028875
+For increment=3: The square roots of the results are the positive values in sequence https://oeis.org/A190576
+For increment=4: The square roots of the results are the positive values in sequence https://oeis.org/A134594
 For increment=5 through increment=25, no sequences were found referencing the
 square roots.
 
@@ -207,20 +207,20 @@ Notes:
 		be where n=k.
 
 			-------------------------------------------------------------------------------------------------------
-				for the following product (P) = n * (n+k) * (n+2*k) * (n+3*k) and result(R) = (P) + k^4
+				for the following product π = n * (n+k) * (n+2*k) * (n+3*k) and resultR = π + k^4
 			-------------------------------------------------------------------------------------------------------
 
-	o	For n=x,k=1 no product has a prime factor of 2 or 3. Proof: (P) is divisible by both 2 and 3. Adding 1 means all results (R) are: (R)=1(mod2) and (R)=1(mod3)
+	o	For n=x,k=1 no product has a prime factor of 2 or 3. Proof: π is divisible by both 2 and 3. Adding 1 means all results R are: R=1(mod2) and R=1(mod3)
 
-	o	for n=x,k=1 no product has a prime factor of 7. Proof: for n=1(mod7) (P)=4(mod7) and (R)=5(mod7). For n=2(mod7) (P)=1(mod7)and (R)=2(mod7). For n=3(mod7)
-		(P) = 3(mod7) and (R)=4(mod7). For n=4(mod7), 5(mod7), 6(mod7) and 0(mod7), (P) = 0(mod7) and (R)=1(mod7).
+	o	for n=x,k=1 no product has a prime factor of 7. Proof: for n=1(mod7) π=4(mod7) and R=5(mod7). For n=2(mod7) π=1(mod7)and R=2(mod7). For n=3(mod7)
+		π = 3(mod7) and R=4(mod7). For n=4(mod7), 5(mod7), 6(mod7) and 0(mod7), π = 0(mod7) and R=1(mod7).
 
-	o	for n=x,k=2 no product has a prime factor of 3. Proof: when (P) = 0(mod3) then (R) = (P) + 2^4 = 1(mod3). If n=0 mod(3), then (P) = 0(mod3). 
-		If n = 1(mod3) then (n+2) = 0(mod3) and (P) = 0(mod3). If n=2(mod3) then n+(2*2) = 0(mod3) and P = 0(mod3).
+	o	for n=x,k=2 no product has a prime factor of 3. Proof: when π = 0(mod3) then R = π + 2^4 = 1(mod3). If n=0 mod(3), then π = 0(mod3). 
+		If n = 1(mod3) then (n+2) = 0(mod3) and π = 0(mod3). If n=2(mod3) then n+(2*2) = 0(mod3) and P = 0(mod3).
 
-	o	for n=x,k=3: no product has a prime factor of 2. Proof: (P) is even. Adding 81 makes the result odd. Odd numbers do not have 2 as a prime factor.
+	o	for n=x,k=3: no product has a prime factor of 2. Proof: π is even. Adding 81 makes the result odd. Odd numbers do not have 2 as a prime factor.
 
-	o	Conjecture: In the Inc_1.txt file, note the first [1], second [2] and third [3] time a prime factor (pf) appears for a result (R). Note n[1],n[2] and n[3].
+	o	Conjecture: In the Inc_1.txt file, note the first [1], second [2] and third [3] time a prime factor (pf) appears for a result R. Note n[1],n[2] and n[3].
 					The next time that (pf) will appear will be at n[4] = n[3] + (n[2]-n[1]). n[5] = n[4] + (n[3] - n[2]). This repeats infinitely for each first
 					occurence of a prime factor (pf).
 					examples: 	(pf)=11:  n[1]=2, n[2]=6, n[3]=13.  n[4]=13 + (6-2)  = 17. n[5] = 17 + (13-6)  = 24.  n[6] = 24 + (17-13) = 28, ...
@@ -232,4 +232,30 @@ Notes:
 							 p | (n + p) * 1 + (n + p + 1)^2
 							 p | (n + 2*p - (2*n+3)) * 1 + (n + 2*p - (2*n+3) + 1)^2
 
+	For the following 4 bullet items, the generated .csv files contain columns for S[n], S[n]^.5 and S[n]+(R[n]^.5). Rather than use program run time
+	for the S[n] calculations, ProductOfFour.py writes the Excel formulas for those values in each row.
+	
+	o	From https://oeis.org/A062938 comments: The sum of any three consecutive R, divided by 3, is a perfect square.  Thus (R[n-2]+R[n-1]+R[n]))/3 is
+		a perfect square. This is also sequence https://oeis.org/A058031.
+		For increment, k, = 1, let R[n] be the result n * (n+1) * (n+2) * (n+3) + 1 and S1[n] = ((R[n-2]+R[n-1]+R[n]))/3)^.5
+		Examples:
+			n = 4, S1[4] = ((R[2]+R[3]+R[4])/3)^.5 = ((121 + 361 + 841) / 3)^.5 = 441^.5 = 21
+			n = 10, S1[10] = ((R[8] + R[9] + R[10])/3)^.5 = ((7921 + 11881 + 17161))^.5 / 3 = 12321^.5 = 111
+			n = 30, S1[30] = ((R[28] + R[29] + R[30])/3)^.5 = ((755161 + 863041 + 982081) / 3)^.5 = 866761^.5 = 931
+	o	(S1[n] + R[n]^.5) / 2 is the square of n+1	
+		Examples:
+			n = 4, S1[4] = 21, R[4]^.5 = 29  21+29 = 50, 50/2 = 25, 25^.5 = 5
+			n = 10, S1[10] = 111, R[10]^.5 = 131, 111+131 = 242 242/2 = 121, 121^.5 = 11
+			n = 30, S1[30] = 931, R[30]^.5 = 991, 991+931 = 1922 1922/2 = 961, 961^.5 = 31
+		The sequence S1[n] + R[n]^.5 is sequence https://oeis.org/A001105
 
+	o	For increment k=2. Let R[n] be the result n * (n+2) * (n+4) * (n+6) + 16,  S2[n] = ((R[n] + R[n-2] + R[n-4]) / 3)^.5. 
+		Examples:
+			n = 5, S2[5] = (R[5] + R[3] + R[1]) / 3)^.5 = ((3481 + 961 + 121) / 3)^.5 = 1521^.5 = 39 
+			n = 11, S2[11] = ((R[11] + R[9] + R[7]) / 3)^.5 = ((36481 + 19321 + 9025) / 3)^.5 = 21609^.5 = 147
+			n = 21, S2[11] = ((R[21] + R[19] + R[17]) / 3)^.5 = ((326041 + 229441 + 156025) / 3)^.5 = 237169^.5 = 487
+	o	(S2[n] + R[n]^.5) / 2 is the square of n+2
+		Examples:
+			n = 5, S2[5] = 39, R[5]^.5 = 59, 39 + 59 = 98, 98/2 = 49, 49^.5 = 7
+			n = 11, S2[11] = 147, R[11]^.5 = 191, 191 + 147 = 338, 338 / 2 = 169, 169^.5 = 13
+			n = 21, s2[21] = 487, R[21]^.5 = 571, 487 + 571 = 1058, 1058 / 2 = 529, 529^.5 = 23

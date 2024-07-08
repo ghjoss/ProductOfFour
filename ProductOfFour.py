@@ -38,7 +38,7 @@ def is_numeric(var):
 
 # Function to format numbers with comma separators
 def FormatWithCommas(num:int):
-	return f'{num:,}' if ADD_THOUSANDS_SEPARATOR else str(num)
+	return f'{num:,}' if ADD_THOUSANDS_SEPARATOR and is_numeric(num) else str(num)
 
 
 
@@ -110,7 +110,7 @@ factorsList = []			# list of the prime factors of the square roots
 factorsDict = {}			# dictionary of lists of the prime factors of the square roots
 INCREMENTS_LINES_PER_PAGE = 50
 if GENERATE_REPORT:
-	HEADER_TXT = "{0:<8}{1:^30}num^0.5(factors)".format("n","num")
+	HEADER_TXT = "{0:<8}{1:^30}R[n]^0.5(factors)".format("n","R[n]")
 	HEADER_LTXT = "-" * 72
 
 # the difference between successive integers in the product of four integers is represented by the
@@ -125,13 +125,13 @@ for increment in range(1,INCREMENT_MAX):
 
 	# for this increment, determine and print the headers.
 	HEADER_0 = "increment == {0:d}".format(increment)
-	HEADER_1 = "num == (n x (n+{0:d}) x (n+{1:d}) x (n+{2:d}) + {3:d})".format(increment,2*increment,3*increment,inc4) + " -or-	 num == (n x {0:d} + (n + {0:d})²)²".format(increment)
+	HEADER_1 = "R[n] == (n x (n+{0:d}) x (n+{1:d}) x (n+{2:d}) + {3:d})".format(increment,2*increment,3*increment,inc4) + " -or-	 R[n] == (n x {0:d} + (n + {0:d})²)²".format(increment)
 
 	# headers for .CSV file (spreadsheet)
 	if GENERATE_SHEET and GENERATE_INCREMENT_OUTPUT and increment <= MAX_INCREMENT_FILES:
-		HDR_1 = ["n","num","sqrt(num)"]
+		HDR_1 = ["n","R[n]","(R[n])^.5","S[n]^2","S[n]","(S[n]+(R[n])^.5)/2","(S[n]+(R[n])^.5)/2)^.5"]
 		HDR_2 = "factor"
-		HEADER_CSV = HDR_1 + [HDR_2]*13 + ["increment=="+"{0:d}".format(increment)]
+		HEADER_CSV = HDR_1 + [HDR_2]*13 + [f"  increment=={increment:.0f}  S[n]=(R[n]+R[n-{increment:.0f}]+R[n-{2*increment:.0f}]/3)^.5"]
 		# open the report for output
 		fCSV = open(DIR_CSV + TEST_NODE+'Inc_'+str(increment)+'.csv', 'w',newline='')
 		writer = csv.writer(fCSV)
@@ -230,8 +230,13 @@ for increment in range(1,INCREMENT_MAX):
 						j = j + 1
 				#end 'while j < len(primes) and breakJ == 0
 
-		if GENERATE_SHEET and GENERATE_INCREMENT_OUTPUT and increment == MAX_INCREMENT_FILES:
-			csvRow = [startInteger, squareNum, sqrtNum] + factorsList
+		if GENERATE_SHEET and GENERATE_INCREMENT_OUTPUT and increment <= MAX_INCREMENT_FILES:
+			if startInteger >= 2*increment + 1:
+				sheetRow = startInteger + 1
+				csvRow = [startInteger, squareNum, sqrtNum,f"=(B{sheetRow}+B{sheetRow-increment}+B{sheetRow-2*increment})/3",f"=SQRT(D{sheetRow})", \
+			   f"=(C{sheetRow}+E{startInteger+1})/2",f"=SQRT(F{startInteger+1})"] + factorsList
+			else:
+				csvRow = [startInteger, squareNum, sqrtNum,"_","_","_","_"] + factorsList
 			writer.writerow([FormatWithCommas(number) for number in csvRow])
 
 		if GENERATE_REPORT:

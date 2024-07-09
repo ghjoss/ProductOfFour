@@ -1,0 +1,62 @@
+ ProductOfFour.json: control parameters for ProductOfFour.py(hereinafter, pgm)
+ If pgm is passed the parameter "T", it will run in debug mode. This will use
+ the settings in the top-level key "debug". Otherwise, the program will run
+ using the settings in the top-level key "max".
+
+In the key/value docs below, debug, test_node, start_of_sequence_max and 
+increment_max have different values depending upon whether pgm is running in 
+DEBUG mode or not. All other values are set in both DEBUG and max mode.
+
+ key                    value:
+"debug"                 true or false. Notifies pgm if DEBUG mode is running
+"test_node"             A high-level qualifier to add to output dataset names
+                        that distinguishes files created in DEBUG mode and
+                        files created when "debug" is false.
+"start_of_sequence_max"
+                        pgm calculates products four at a time, staring with
+                        a starting integer. These calculations will continue
+                        until the starting integer reaches the number 
+                        specified by start_of_sequence_max.
+"increment_max"         For calculations the increment of the arithmetic
+                        series of four numbers is in
+
+"output_folder"         Specify the name of the sub-directory where all output
+                        will be written. This sub-directory will be created in the
+                        directory where pgm is defined.
+
+"generate_sheet"        true: The program will generate .csv files depending upon
+                              how generate_increment_output and generate_squares_output
+                              are defined.
+"generate_report"       true: The program will generate .txt files depending upon
+                              how generate_increment_output and generate_squares_output
+                              are defined.
+"generate_incremenet_output"
+                        true: Create the Inc_*.csv and Inc_*.txt files. Which of these
+                              get written depends on generate_sheet and generate_report.
+                              
+"generate_squares_output:
+                        true: Create squares*.csv and squares*.txt. Which of these
+                              get written depends on generate_sheet and generate_report.
+
+"max_increment_files:   The program is capable of writing well two times 
+                        start_of_sequence_max Inc_*.* output files. max_increment_files
+                        limits that number to a smaller number of files. If this
+                        value is not a number, then start_of_sequence_max files
+                        x 2 are written.
+"squares_pages_per_file"        
+                        if the squares*.txt and squares*.csv files are written with
+                        all data, there is a likely possibility that the file
+                        cannot be edited due to its size. pages_per_file limits
+                        the squares file to this many pages before increasing
+                        the file number and starting the next lines in that file.
+"squares_lines_per_page"
+                        A number indicating how many lines will be written to
+                        squares*.txt before the page-headers are written again.
+
+"increments_lines_per_page"
+                        A number indicating how many lines will be written to
+                        Inc_*.txt before the page-headers are written again.
+
+"add_thousands_separator"
+                        true: add commas(,) as separators for numbers > 1000
+

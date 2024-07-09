@@ -1,0 +1,29 @@
+{
+    "debug": {
+        "debug": true,
+        "test_node": "TEST_",
+        "start_of_sequence_max": 101,
+        "increment_max": 301
+    },
+    "max": {
+        "debug": false,
+        "test_node": "",
+        "start_of_sequence_max": 5551,
+        "increment_max": 2001
+    },
+
+    "output_folder":"Pof4_OUTPUT",
+    "generate_sheet":true,
+    "generate_increment_output": true,
+    "generate_squares_output": true,
+    "generate_report": true,
+
+    "max_increment_files": 50,
+
+    "squares_pages_per_file": 250,
+    "squares_lines_per_page": 50,
+	"increments_lines_per_page": 50,
+
+    "add_thousands_separator": true
+ }
+  

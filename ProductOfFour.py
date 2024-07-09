@@ -27,20 +27,7 @@ import sys
 import collections
 import time
 import csv
-
-# set addThousandsSeparator to False to cause large numbers to be written without
-# a thousands, millions, ... ',' separator.
-ADD_THOUSANDS_SEPARATOR = True
-
-def is_numeric(var):
-	""" checks if a variable is numeric type using isinstance."""
-	return isinstance(var, (int, float, complex))
-
-# Function to format numbers with comma separators
-def FormatWithCommas(num:int):
-	return f'{num:,}' if ADD_THOUSANDS_SEPARATOR and is_numeric(num) else str(num)
-
-
+import json
 
 splits = {}
 splits[0] = time.time()
@@ -64,10 +51,50 @@ else:
 	TEST_NODE = ""
 	START_OF_SEQUENCE_MAX = 5551				# top of range, will actually iterate n - 1
 	INCREMENT_MAX = 2001
+PATH = os.path.dirname(__file__) + "/"
+with open(PATH + "ProductOfFour.json","r") as jsonFile:
+	jsonData = jsonFile.read()
+	settings = json.loads(jsonData)
+	if DEBUG:
+		TEST_NODE = settings["debug"]["test_node"]
+		START_OF_SEQUENCE_MAX = settings["debug"]["start_of_sequence_max"]
+		INCREMENT_MAX = settings["debug"]["increment_max"]
+	else:
+		TEST_NODE = settings["max"]["test_node"]
+		START_OF_SEQUENCE_MAX = settings["max"]["start_of_sequence_max"]
+		INCREMENT_MAX = settings["max"]["increment_max"]
+
+	OUTPUT_FOLDER = settings["output_folder"]
+	# True=generate spreadsheet data, False=no spreadsheet data
+	GENERATE_SHEET = settings["generate_sheet"]
+	# True=generate ...txt files, false no files
+	GENERATE_REPORT = settings["generate_report"]
+	# True=generate ...INCn_.csv and ...INCn.txt files, false, no increment output
+	GENERATE_INCREMENT_OUTPUT = settings["generate_increment_output"]
+	# True=generate ...squares.csv & txt, false no squares output
+	GENERATE_SQUARES_OUTPUT = settings["generate_squares_output"]
+
+	# number of INC_... files to write (one each of .csv and .txt)
+	MAX_INCREMENT_FILES = settings["max_increment_files"]
+
+	SQUARES_PAGES_PER_FILE = settings["squares_pages_per_file"]
+	SQUARES_LINES_PER_PAGE = settings["squares_lines_per_page"]
+	INCREMENTS_LINES_PER_PAGE = settings["increments_lines_per_page"]
+
+	# set addThousandsSeparator to False to cause large numbers to be written without
+	# a thousands, millions, ... ',' separator.
+	ADD_THOUSANDS_SEPARATOR = settings["add_thousands_separator"]
+
+# Function to format numbers with comma separators
+def FormatWithCommas(num:int):
+	return f'{num:,}' if ADD_THOUSANDS_SEPARATOR and isinstance(num,(int,float)) else str(num)
+
+if not isinstance(MAX_INCREMENT_FILES,(int,float)):
+	MAX_INCREMENT_FILES = INCREMENT_MAX # write all of them
 
 # get working directory of this python program, add
 # an Output subdirectory (if necessary).
-OUTPUT_DIR = os.path.dirname(__file__) + "/Pof4_Output"
+OUTPUT_DIR = PATH + OUTPUT_FOLDER
 try:
 	os.mkdir(OUTPUT_DIR)
 except OSError as error:
@@ -77,20 +104,14 @@ except OSError as error:
 
 DIR_CSV = OUTPUT_DIR + "/"
 DIR_TXT = OUTPUT_DIR + "/"
-GENERATE_SHEET = True			# True=generate spreadsheet data, False=no spreadsheet data
-GENERATE_INCREMENT_OUTPUT = True
-GENERATE_SQUARES_OUTPUT = True
-GENERATE_REPORT = True			# True=generate text report, False=no text report
-MAX_INCREMENT_FILES = 50		# number of INC_... files to write (one each of .csv and .txt)
-
-if not is_numeric(MAX_INCREMENT_FILES):
-	MAX_INCREMENT_FILES = INCREMENT_MAX # write all of them
 
 if not GENERATE_SHEET and not GENERATE_REPORT:
-	print("Must run to generate either sheet or text report or both, but not neither.")
+	print("Check the file ProductOf_Four.json:\n" \
+	   "Either of the values generate_sheet and generate_report \n (or both) must be true. Both were 'false'.")
 	exit()
 if not GENERATE_INCREMENT_OUTPUT and not GENERATE_SQUARES_OUTPUT:
-	print("Must run to generate either increment files ("+TEST_NODE+"Inc_...) and/or squares analysis files ("+TEST_NODE+"Squares_...)")
+	print("Check the file ProductOfFour.json:\n"
+	   "Either of the values generate_increment_output and generate_squares_output \n (or both) must be true. Both were 'false'.")
 	exit()
 # Prime lists, _100KPrimes or _50KPrimes
 sys.path.append('.')
@@ -108,7 +129,7 @@ for w in _100KPrimes.primes:
 squaresDict = {}			# dictionary of lists of the generated squares and square roots. Key = square number
 factorsList = []			# list of the prime factors of the square roots
 factorsDict = {}			# dictionary of lists of the prime factors of the square roots
-INCREMENTS_LINES_PER_PAGE = 50
+
 if GENERATE_REPORT:
 	HEADER_TXT = "{0:<8}{1:^30}R[n]^0.5(factors)".format("n","R[n]")
 	HEADER_LTXT = "-" * 72
@@ -433,7 +454,7 @@ if GENERATE_REPORT and GENERATE_SQUARES_OUTPUT:
 	pages = 0
 	# after this many pages, squaresN.txt is closed and a new file is created
 	# (N=1,2,3,...)
-	PAGES_PER_FILE = 250
+	SQUARES_PAGES_PER_FILE = 250
 	# number of data lines before printing a new set of headers
 	SQUARES_LINES_PER_PAGE = 50 
 	header = f"{'Number(Root)':^30}"
@@ -445,7 +466,7 @@ if GENERATE_REPORT and GENERATE_SQUARES_OUTPUT:
 		vTXT = [FormatWithCommas(number) for number in val.copy()]
 		if lines % SQUARES_LINES_PER_PAGE == 0:
 			pages += 1
-			if pages % PAGES_PER_FILE == 1:
+			if pages % SQUARES_PAGES_PER_FILE == 1:
 				if pages > 1:
 					fsqTXT.close()
 				files += 1

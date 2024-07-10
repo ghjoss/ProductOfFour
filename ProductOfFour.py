@@ -399,9 +399,10 @@ with open(DIR_TXT+TEST_NODE+"bigdictionary.txt","w") as bdo:
 		if listLen > lMax:
 			lMax = listLen
 	print(f"\nMax length of dictionary entries: {lMax:d}", file=bdo)
-	print('\nReport of sequences with an odd number of n/k pairs:\n', file=bdo)
+with open(DIR_TXT+TEST_NODE+"OddSequences.txt","w") as odd:
+	print('Report of resultant square numbers with an odd number of n/k pairs:\n', file=odd)
 	for k,v in oddSequences.items():
-		print(f'{k}: {v}', file=bdo)
+		print(f'{k}: {v}', file=odd)
 
 	if osqCt == 0:
 		print("No data", file=bdo)

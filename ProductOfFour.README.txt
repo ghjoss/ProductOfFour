@@ -57,6 +57,12 @@ DEBUG mode or not. All other values are set in both DEBUG and max mode.
                         A number indicating how many lines will be written to
                         Inc_*.txt before the page-headers are written again.
 
+""Odd_Sequences_Include_Singlets"
+                        true: include the single n/k pair when reporting the n=k results
+                              along with the multiple pair sequences in  OddSequences.txt
+                        false: Only include the n/k pairs when reporting the n=k results in
+                              more than 3 pairs.
+
 "add_thousands_separator"
                         true: add commas(,) as separators for numbers > 1000
 

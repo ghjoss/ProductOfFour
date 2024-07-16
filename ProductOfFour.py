@@ -41,16 +41,6 @@ if len(sys.argv) > 1:
 	if arg1.startswith("f") or arg1 == "0":
 		DEBUG = False
 
-if DEBUG:
-	TEST_NODE = "TEST_"			# when debugging, prepend 'TEST_' to the output file names
-	START_OF_SEQUENCE_MAX = 100
-	INCREMENT_MAX = 300
-# startOfSequenceMax = 5551 and incrementMax = 1201 runs for about 10 minutes on a PC running
-# Windows 10 on a Core i7 running at 2.4Ghz. Memory = 32GB.
-else:
-	TEST_NODE = ""
-	START_OF_SEQUENCE_MAX = 5551				# top of range, will actually iterate n - 1
-	INCREMENT_MAX = 2001
 PATH = os.path.dirname(__file__) + "/"
 with open(PATH + "ProductOfFour.json","r") as jsonFile:
 	jsonData = jsonFile.read()
@@ -80,6 +70,7 @@ with open(PATH + "ProductOfFour.json","r") as jsonFile:
 	SQUARES_PAGES_PER_FILE = settings["squares_pages_per_file"]
 	SQUARES_LINES_PER_PAGE = settings["squares_lines_per_page"]
 	INCREMENTS_LINES_PER_PAGE = settings["increments_lines_per_page"]
+	ODDSEQUENCES_SINGLET = settings["Odd_Sequences_Include_Singlets"]
 
 	# set addThousandsSeparator to False to cause large numbers to be written without
 	# a thousands, millions, ... ',' separator.
@@ -389,18 +380,26 @@ with open(DIR_TXT+TEST_NODE+"bigdictionary.txt","w") as bdo:
 	for o in osq:
 		listLen = int((len(osq[o]) - 2))
 		listLenHalf = listLen / 2
-		if not listLenHalf % 2 == 0:
+		if ODDSEQUENCES_SINGLET:
+			testSeq = 1
+		else:
+			testSeq = 3
+		if not listLenHalf % 2 == 0 and listLenHalf >= testSeq:
 			oddSequence = osq[o][2:]
 			if oddSequence[0] == oddSequence[-1]:
-				oddSeqKey = str(osq[o][0])+"("+str(osq[o][1])+")"
-				oddSequences[oddSeqKey] = oddSequence
+				n = str(osq[o][0])+"("+str(osq[o][1])+")"
+				oddSeqKey = f'{n:>30}) ==> {oddSequence[int(listLenHalf)-1]:<6}'
+				factorsKey = osq[o][0]
+				oddSequences[oddSeqKey] = "[" + ", ".join(str(num) for num in oddSequence) + "]    (" + ", ".join(f'{num:.0f}' for num in factorsDict[factorsKey]) + ")" 
 		print(listLen, ":", osq[o][:2], osq[o][2:], file=bdo)
+
 		osqCt += 1
 		if listLen > lMax:
 			lMax = listLen
 	print(f"\nMax length of dictionary entries: {lMax:d}", file=bdo)
 with open(DIR_TXT+TEST_NODE+"OddSequences.txt","w") as odd:
-	print('Report of resultant square numbers with an odd number of n/k pairs:\n', file=odd)
+	ons = " " if ODDSEQUENCES_SINGLET else " (>1) "
+	print(f'Report of resultant square numbers with an odd number{ons}of n/k pairs:\n', file=odd)
 	for k,v in oddSequences.items():
 		print(f'{k}: {v}', file=odd)
 

@@ -24,6 +24,8 @@
     "squares_lines_per_page": 50,
 	"increments_lines_per_page": 50,
 
-    "add_thousands_separator": true
+    "add_thousands_separator": true,
+
+    "Odd_Sequences_Include_Singlets":false
  }
   

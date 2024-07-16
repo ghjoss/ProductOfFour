@@ -1,4 +1,4 @@
-The product π of four integers in a consecutive aritmetic sequence (difference = "increment")
+The product Π of four integers in a consecutive aritmetic sequence (difference = "increment")
 added to the increment integer value raised to the fourth power is always a squared integer
 value. As an example:
 sequence 2 4 6 8  (increment = 2): 2 * 4 * 6 * 8 + 2^4 = 384 + 16 = 400
@@ -227,10 +227,12 @@ Notes:
 			58564000000(242000): [380, 80, 220, 220, ==>80<==, 380]
 			1024000000(32000): [80, 80]
 			521284000000(722000): [820, 20, 380, 380, 20, 820] ...380 is a multiple of 19
+		Conjecture: The sequence of primes s.t. the n/k combinations is an odd number >=3 matches the OEIS sequences: A038872, A045468, A141158, A064739,
+					A076518, A336043
 																												
-	o	for n=k, the square root of the result (s) is 5 * n^2. Proof: By formula 2, s=n*k + (n+k)^2). For k=n this becomes n^2 + (2*n)^2 = n^2 + 4*n^2 = 5 * n^2
+	o	for n=k, the square root of the result (R[n,n]^0.5) is 5 * n^2. Proof: By formula 2, R[n,n]^0.5=n*k + (n+k)^2). For k=n this becomes n^2 + (2*n)^2 = n^2 + 4*n^2 = 5 * n^2
 
-	o	As noted, for n=k R's square root is 5 n^2.  For n-1:k+1 and n+1:k-1 the square root of the result is 5*n^2 - 1.  Proof: for k=n, n-1:k+1 = n-1:n+1. 
+	o	As noted, for n=k R[n]'s square root is 5 n^2.  For n-1:k+1 and n+1:k-1 the square root of the result is 5*n^2 - 1.  Proof: for k=n, n-1:k+1 = n-1:n+1. 
 		Again using Formula 2, the square root of the result is (n-1)*(n+1) + (n-1 + n + 1)^2 = n^2 - 1 + (2*n)^2 = 5*n^2 - 1 
 	
 	o	For every n=x,k=y pair that generates a number, there exists an n=y,k=x pair that generates the same number. Proof: Using Formula 2 (n*k + (n+k)^2)^2 for the sequence 
@@ -238,18 +240,18 @@ Notes:
 		be where n=k.
 
 			-------------------------------------------------------------------------------------------------------
-				for the following product π = n * (n+k) * (n+2*k) * (n+3*k) and result R = π + k^4
+				for the following product Π(n,k) = n * (n+k) * (n+2*k) * (n+3*k) and result R[n,k] = Π(n,k) + k^4
 			-------------------------------------------------------------------------------------------------------
 
-	o	For n=x,k=1 no R has a prime factor of 2 or 3. Proof: π is divisible by both 2 and 3. Adding 1 means all results R are: R=1(mod2) and R=1(mod3)
+	o	For n=x,k=1 no R[n,1] has a prime factor of 2 or 3. Proof: Π(n,k) is divisible by both 2 and 3. Adding 1 means all results R are: R[n,1]=1(mod2) and R=1(mod3)
 
-	o	for n=x,k=1 no R has a prime factor of 7. Proof: for n=1(mod7) π=4(mod7) and R=5(mod7). For n=2(mod7) π=1(mod7)and R=2(mod7). For n=3(mod7)
-		π = 3(mod7) and R=4(mod7). For n=4(mod7), 5(mod7), 6(mod7) and 0(mod7), π = 0(mod7) and R=1(mod7).
+	o	for n=x,k=1 no R has a prime factor of 7. Proof: for n=1(mod7) Π(n,1)=4(mod7) and R[n,1]=5(mod7). For n=2(mod7) Π(n,1)=1(mod7)and R[n,1]=2(mod7). For n=3(mod7)
+		Π(3,1) = 3(mod7) and R[n,1]=4(mod7). For n=4(mod7), 5(mod7), 6(mod7) and 0(mod7), Π(n,1) = 0(mod7) and R[n,1]=1(mod7).
 
-	o	for n=x,k=2 no R has a prime factor of 3. Proof: when π = 0(mod3) then R = π + 2^4 = 1(mod3). If n=0 mod(3), then π = 0(mod3). 
-		If n = 1(mod3) then (n+2) = 0(mod3) and π = 0(mod3). If n=2(mod3) then n+(2*2) = 0(mod3) and P = 0(mod3).
+	o	for n=x,k=2 no R[n,2] has a prime factor of 3. Proof: when Π(n,2) = 0(mod3) then R[n,2] = Π[n,2] + 2^4 = 1(mod3). If n=0 mod(3), then Π[n,2] = 0(mod3). 
+		If n = 1(mod3) then (n+2) = 0(mod3) and Π(n,2) = 0(mod3). If n=2(mod3) then n+(2*2) = 0(mod3) and Π[n,2] = 0(mod3).
 
-	o	for n=x,k=3: no R has a prime factor of 2. Proof: π is even. Adding 81 makes the result odd. Odd numbers do not have 2 as a prime factor.
+	o	for n=x,k=3: no R[n,k] has a prime factor of 2. Proof: Π[n,3] is even. Adding 81(3^4) makes the result odd. Odd numbers do not have 2 as a prime factor.
 
 	o	Conjecture: In the Inc_1.txt file, note the first [1], second [2] and third [3] time a prime factor (pf) appears for a result R. Note n[1],n[2] and n[3].
 					The next time that (pf) will appear will be at n[4] = n[3] + (n[2]-n[1]). n[5] = n[4] + (n[3] - n[2]). This repeats infinitely for each first
@@ -268,7 +270,7 @@ Notes:
 	
 	o	From https://oeis.org/A062938 comments: The sum of any three consecutive R, divided by 3, is a perfect square.  Thus (R[n-2]+R[n-1]+R[n]))/3 is
 		a perfect square. This is also sequence https://oeis.org/A058031.
-		For increment, k, = 1, let R[n] be the result n * (n+1) * (n+2) * (n+3) + 1 and S1[n] = ((R[n-2]+R[n-1]+R[n]))/3)^.5
+		For increment, k = 1, let R[n,1] be the result n * (n+1) * (n+2) * (n+3) + 1 and S1[n] = ((R[n-2]+R[n-1]+R[n]))/3)^.5
 		Examples:
 			n = 4, S1[4] = ((R[2]+R[3]+R[4])/3)^.5 = ((121 + 361 + 841) / 3)^.5 = 441^.5 = 21
 			n = 10, S1[10] = ((R[8] + R[9] + R[10])/3)^.5 = ((7921 + 11881 + 17161))^.5 / 3 = 12321^.5 = 111

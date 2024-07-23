@@ -12,13 +12,13 @@ DEBUG mode or not. All other values are set in both DEBUG and max mode.
 "test_node"             A high-level qualifier to add to output dataset names
                         that distinguishes files created in DEBUG mode and
                         files created when "debug" is false.
-"start_of_sequence_max"
+"start_of_progression_max"
                         pgm calculates products four at a time, staring with
                         a starting integer. These calculations will continue
                         until the starting integer reaches the number 
-                        specified by start_of_sequence_max.
-"increment_max"         For calculations the increment of the arithmetic
-                        series of four numbers is in
+                        specified by start_of_progression_max.
+"difference_max"        For calculations the difference of the arithmetic
+                        progerssion  of four numbers is in
 
 "output_folder"         Specify the name of the sub-directory where all output
                         will be written. This sub-directory will be created in the
@@ -30,18 +30,18 @@ DEBUG mode or not. All other values are set in both DEBUG and max mode.
 "generate_report"       true: The program will generate .txt files depending upon
                               how generate_increment_output and generate_squares_output
                               are defined.
-"generate_incremenet_output"
-                        true: Create the Inc_*.csv and Inc_*.txt files. Which of these
+"generate_difference_output"
+                        true: Create the Diff_*.csv and Diff_*.txt files. Which of these
                               get written depends on generate_sheet and generate_report.
                               
 "generate_squares_output:
                         true: Create squares*.csv and squares*.txt. Which of these
                               get written depends on generate_sheet and generate_report.
 
-"max_increment_files:   The program is capable of writing well two times 
-                        start_of_sequence_max Inc_*.* output files. max_increment_files
+"max_difference_files:  The program is capable of writing well twice the number of 
+                        start_of_progression_max Diff_*.* output files. max_increment_files
                         limits that number to a smaller number of files. If this
-                        value is not a number, then start_of_sequence_max files
+                        value is not a number, then start_of_progression_max files
                         x 2 are written.
 "squares_pages_per_file"        
                         if the squares*.txt and squares*.csv files are written with
@@ -53,15 +53,15 @@ DEBUG mode or not. All other values are set in both DEBUG and max mode.
                         A number indicating how many lines will be written to
                         squares*.txt before the page-headers are written again.
 
-"increments_lines_per_page"
+"differences_lines_per_page"
                         A number indicating how many lines will be written to
-                        Inc_*.txt before the page-headers are written again.
+                        Diff_*.txt before the page-headers are written again.
 
-""Odd_Sequences_Include_Singlets"
-                        true: include the single n/k pair when reporting the n=k results
-                              along with the multiple pair sequences in  OddSequences.txt
-                        false: Only include the n/k pairs when reporting the n=k results in
-                              more than 3 pairs.
+"all_sequences_pages_per_file"
+"all_sequences_lines_per_page"
+                        THese two "all_sequences..." settings affect the allSequencesX.txt
+                        reports similar to how the "squares..." affect the squaresX.txt 
+                        reports.
 
 "add_thousands_separator"
                         true: add commas(,) as separators for numbers > 1000

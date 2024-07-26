@@ -2,14 +2,14 @@
     "debug": {
         "debug": true,
         "test_node": "TEST_",
-        "start_of_progression_max": 101,
-        "difference_max": 301
+        "start_of_progression_max": 100,
+        "difference_max": 300
     },
     "max": {
         "debug": false,
         "test_node": "",
-        "start_of_progression_max": 5551,
-        "difference_max": 2001
+        "start_of_progression_max": 5550,
+        "difference_max": 2000
     },
 
     "output_folder":"Pof4_OUTPUT",

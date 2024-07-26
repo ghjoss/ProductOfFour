@@ -18,7 +18,7 @@ DEBUG mode or not. All other values are set in both DEBUG and max mode.
                         until the starting integer reaches the number 
                         specified by start_of_progression_max.
 "difference_max"        For calculations the difference of the arithmetic
-                        progerssion  of four numbers is in
+                        progression of four numbers
 
 "output_folder"         Specify the name of the sub-directory where all output
                         will be written. This sub-directory will be created in the

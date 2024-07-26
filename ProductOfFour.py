@@ -10,15 +10,15 @@
 
 	See difference_max and start_Of_progression_max below.
 
-	Also, see the On-line Encyclopedia of Integer Sequences article #A062938 (https://oeis.org/A062938)
+	Also, see the On-line Encyclopedia of Integer Sequences (OEIS) article #A062938 (https://oeis.org/A062938)
 	This sequence, generalized for all differences (not only inc=1), is used in the
 	code below to evaluate the square roots without having to use the sqrt() function. 
 
-	For difference=1: The square roots are the values in sequence #A028387. 
-	For difference=2: The square roots are the positive values in sequence #A028875
-	For difference=3: The square roots are the positive values in sequence #A190576
-	For difference=4: The square roots are the positive values in sequence #A134594
-	For difference=5 through difference=25, no sequences were found referencing the
+	For difference=1: The square roots of the results are the values in sequence #A028387. 
+	For difference=2: The square roots of the results are the positive values in sequence #A028875
+	For difference=3: The square roots of the results are the positive values in sequence #A190576
+	For difference=4: The square roots of the results are the positive values in sequence #A134594
+	For difference=5 through difference=25, no sequences were found in the OEIS referencing the
 	square roots.
 """
 import os
@@ -42,17 +42,24 @@ if len(sys.argv) > 1:
 		DEBUG = False
 
 PATH = os.path.dirname(__file__) + "/"
+"""
+Process the configuration parameters .json file. See ProductOfFour.README.txt
+for a description of the paramters.
+TODO: Add a schema to validate the json parameters.
+For START_OF_PROGRESSION_MAX and DIFFERENCE_MAX, add 1 to the .json file value
+so that the upper value for range testing will be correct for loops.
+"""
 with open(PATH + "ProductOfFour.json","r") as jsonFile:
 	jsonData = jsonFile.read()
 	settings = json.loads(jsonData)
 	if DEBUG:
 		TEST_NODE = settings["debug"]["test_node"]
-		START_OF_PROGRESSION_MAX = settings["debug"]["start_of_progression_max"]
-		DIFFERENCE_MAX = settings["debug"]["difference_max"]
+		START_OF_PROGRESSION_MAX = settings["debug"]["start_of_progression_max"] + 1
+		DIFFERENCE_MAX = settings["debug"]["difference_max"] + 1
 	else:
 		TEST_NODE = settings["max"]["test_node"]
-		START_OF_PROGRESSION_MAX = settings["max"]["start_of_progression_max"]
-		DIFFERENCE_MAX = settings["max"]["difference_max"]
+		START_OF_PROGRESSION_MAX = settings["max"]["start_of_progression_max"] + 1
+		DIFFERENCE_MAX = settings["max"]["difference_max"] + 1
 
 	OUTPUT_FOLDER = settings["output_folder"]
 	# True=generate spreadsheet data, False=no spreadsheet data
@@ -78,15 +85,13 @@ with open(PATH + "ProductOfFour.json","r") as jsonFile:
 	ALL_SEQUENCES_PAGES_PER_FILE = settings["all_sequences_pages_per_file"]
 	ALL_SEQUENCES_LINES_PER_PAGE = settings["all_sequences_lines_per_page"]
 
-# Get sigma[2,n^2]
-def sigma_2(num):
-	numSq = num * num
-	divisors = [d for d in range(1,numSq+1) if numSq%d == 0]
-	return sum(d**2 for d in divisors)
-
-# Function to format numbers with comma separators
+"""
+	Function to format numbers with comma separators. This function only does
+	this if ADD_THOUSANDS_SEPARATOR .json file parameter is set to True.
+"""
 def FormatWithCommas(num:int):
 	return f'{num:,}' if ADD_THOUSANDS_SEPARATOR and isinstance(num,(int,float)) else str(num)
+
 
 if not isinstance(MAX_DIFFERENCE_FILES,(int,float)):
 	MAX_DIFFERENCE_FILES = DIFFERENCE_MAX # write all of them
@@ -114,6 +119,19 @@ if not GENERATE_DIFFERENCE_OUTPUT and not GENERATE_SQUARES_OUTPUT:
 	exit()
 # Prime lists, _100KPrimes or _50KPrimes
 sys.path.append('.')
+
+
+"""
+	Get sigma[2,n^2]. This is the sum of the squares of the divisors
+	of the passed number squared. Example: for num=2, num² = 4. Divisors
+	of 4 are 1, 2 and 4. Squares of the divisors: 1, 4, 16. Sum=21.
+	Thus sigma_2(4) = 21
+"""
+def sigma_2(num):
+	numSq = num * num
+	divisors = [d for d in range(1,numSq+1) if numSq%d == 0]
+	return sum(d**2 for d in divisors)
+
 import _100KPrimes				#100,000 prime numbers in a list named "primes"
 # maxPrime: in the array of primes, this is the offset of the last
 # prime to process.
@@ -136,7 +154,7 @@ if GENERATE_TXT_FILES:
 
 # the difference between successive integers in the product of four integers is represented by the
 # variable 'difference'. These differences will be iterated from 1 through DIFFERENCE_MAX. The program will 
-# calculate START_OF_PROGRESSION_MAX products for each difference.
+# calculate a(n) for each difference iterated up to START_OF_PROGRESSION_MAX calculations per difference.
 for difference in range(1,DIFFERENCE_MAX):
 	# to the product of four integers separated by 'difference' will be added difference to the 4th power
 	# this will make the product + the 4th power of difference a perfect square integer.
@@ -167,9 +185,10 @@ for difference in range(1,DIFFERENCE_MAX):
 			fTXT = open(DIR_TXT + TEST_NODE+'Diff_'+str(difference)+'.txt', 'w') # for running on laptop machine
 
 	# loop through the first "startOfSequenceMax" integers, calculating the product of four integers that are
-	# in an arithmetic sequencce separated by the current difference
-	# Note that analysis has shown that the square root of the product for the current index (== i) can
-	# be calculated as the sum: (i + (i+difference)**2). This is probably faster than doing the product and then taking the square root.
+	# in an arithmetic progression, separated by the current "difference" value.
+	# Note that analysis has shown that the square root of the product for the current index (== n) can
+	# be calculated as the sum: (n + (i+difference)**2). This is probably faster than doing the product and then 
+	# taking the square root.
 	for startInteger in range(1,START_OF_PROGRESSION_MAX):
 		factorsList = []
 		# the text file output header is printed every 45 lines.
@@ -183,11 +202,11 @@ for difference in range(1,DIFFERENCE_MAX):
 					print(HEADER_TXT, file=fTXT)
 					print(HEADER_LTXT, file=fTXT)
 
-		# squareNum = i * (i + difference) * (i + 2*difference) * (i + 3*difference) + difference**4
+		# squareNum = n * (n + difference) * (n + 2*difference) * (n + 3*difference) + difference**4
 		# factorizationTestNum = sqrtNum = a(n) ** 0.5
 		# alternative, equivalent values
 		i1Sum = startInteger + difference
-		factorizationTestNum = sqrtNum = startInteger*difference + i1Sum * i1Sum	 #factorizationTestNum = sqrtNum = i*difference + (i+difference)²
+		factorizationTestNum = sqrtNum = startInteger*difference + i1Sum * i1Sum  #factorizationTestNum = sqrtNum = i*difference + (i+difference)²
 		# squareNum = (iProd + i1Sum**2)**2
 		squareNum = sqrtNum * sqrtNum
 
@@ -196,12 +215,16 @@ for difference in range(1,DIFFERENCE_MAX):
 			sqrtModList.append(sqrtNum % difference)
 			numModList.append(squareNum % difference)
 
+		# when n (startInteger) and k (difference) are equal, then this is the middle pair of a
+		# sequence of pairs that generate the same a(n). THis is therefore part of an odd number
+		# such pairs.
 		if startInteger == difference:
 			oddsDict[squareNum] = [startInteger]
+
 		if squareNum in squaresDict:	  # have we already seen this number when processing a previous arithmetic sequence?
-			# yes, append the current value of i and the difference to the list entry for this number
+			# yes, append the current value of n and the difference to the list entry for this number
 			sqList = squaresDict[squareNum]	 # get the list
-			sqList.append(startInteger)		 # add current '1st of the four arithmetic sequence' value (i)
+			sqList.append(startInteger)		 # add current '1st of the four arithmetic sequence' value (n)
 			sqList.append(difference)		 # add the current difference value
 		else:
 			# no, add a new dictionary entry with key = 'a(n)' (a list)
@@ -365,23 +388,26 @@ for difference in range(1,DIFFERENCE_MAX):
 #end 'for difference in range(1,...'
 
 if GENERATE_SQUARES_OUTPUT:
-	#
-	# Each calculated square number was added as a key to a dictionary (squaresDict). That dictionary keeps track of all the
-	# four number arithmetic sequences and the difference between consecutive numbers in that sequence.
-	# So, for instance, the number 43681 (209 * 209) is generated by:
-	#	13 * 14 * 15 * 16 + 1	(start = 13,diff = 1: 1**4)
-	#	8 * 13 * 18 * 23 + 625	(start = 8, diff = 5: 5**4)
-	#	5 * 13 * 21 * 29 + 4096 (start = 5, diff = 8: 8**4)
-	#	1 * 14 * 27 * 40 + 28561 (start = 1, diff = 13: 13 ** 4)
-	# Thus the dictionary entry for 43681 is: 43681,209,13,1,8,5,5,8,1,13
-	#
+	"""
+		Each calculated square number was added as a key to a dictionary (squaresDict). That dictionary keeps track of all the
+		four number arithmetic sequences and the difference between consecutive numbers in that sequence.
+		So, for instance, the number 43681 (209 * 209) is generated by:
+			13 * 14 * 15 * 16 + 1	(start = 13,diff = 1: 1**4)
+			8 * 13 * 18 * 23 + 625	(start = 8, diff = 5: 5**4)
+			5 * 13 * 21 * 29 + 4096 (start = 5, diff = 8: 8**4)
+			1 * 14 * 27 * 40 + 28561 (start = 1, diff = 13: 13 ** 4)
+		Thus the dictionary entry for 43681 is: 43681,209,13,1,8,5,5,8,1,13
+	"""
+
 	print("Multiple starting integer/difference pairs generate the same square number. Iterate over the")
 	print("squaresDict collection to find these sequences/difference pairs.")
-	# "e.g.: 43861 == 209*209 
-	# == 13*14*15*16+1 
-	# == 8*13*18*23+625 (5^4) 
-	# == 5*13*21*29+512 (8^4) 
-	# == 1 * 14 * 27 * 40 + 28561 (13^4)")
+	"""
+	e.g.: 43861 == 209*209 
+		== 13*14*15*16+1 
+		== 8*13*18*23+625 (5^4) 
+		== 5*13*21*29+512 (8^4) 
+		== 1 * 14 * 27 * 40 + 28561 (13^4)")
+	"""
 osq = collections.OrderedDict(sorted(squaresDict.items())) #osq: o_rdered sq_uares dictionary
 osqCt = 0
 lMax = -1
@@ -390,10 +416,11 @@ oddSequences = {}
 
 allSeqFiles = 1
 allSeqPages = 1
+allSeqHdr1 = "a(n)(sq.rt)"+" "*29 + "Odd    [n1,k1,n2,k2,...,k1,n1]" + " " * 34 + "Factors" + " " * 54 + "sigma[2,n²]"
+allSeqHdr0 = "-" * 192
+
 allSeq = open(DIR_TXT+TEST_NODE+"allSequences"+str(allSeqFiles)+".txt","w")
 
-allSeqHdr1 = "a(n)(sq.rt)"+" "*29 + "Odd    [n1,k1,n2,k2,...,k1,n1]" + " " * 34 + "Factors" + " " * 54 + "sigma[2,n²]"
-allSeqHdr0 = "-" * 176
 print(f'{allSeqHdr0}\n{allSeqHdr1}\n{allSeqHdr0}',file=allSeq)
 allSeqLines = 3
 
@@ -411,7 +438,9 @@ try:
 			if inOddSeq:
 				middlePairNum = oddsDict[squareNum][0]
 				s2 = sigma_2(middlePairNum)
-				pr = f'sigma[2,{middlePairNum}²]: {s2}'
+				s2s = str(s2)
+				spaces = " " * (26 - len(s2s) - len(str(middlePairNum)))
+				pr = f'sigma[2,{middlePairNum}²]: {s2s}{spaces}({s2s[-1:]})'
 				dot = "."
 			else:
 				pr = ""
@@ -440,22 +469,25 @@ try:
 				allSeqLines += 5
 
 			if inOddSeq:
-				# this is a sequence with an odd number of n/k pairs. We have the a(n), diff=k,
-				# result: use this to pull out the value of middle pair where n==k. Use this 
-				# number to generate a sigma[2,n] value.
+				"""
+				 this is a sequence with an odd number of n/k pairs. We have the a(n), diff=k,
+				 result: use this to pull out the value of middle pair where n==k. Use this 
+				 number to generate a sigma[2,n] value.
+				"""
 				middlePairNum = oddsDict[squareNum][0]
 				n = FormatWithCommas(squareNum)+"("+FormatWithCommas(osq[o][1])+")"
 				oddSeqKey = f'{n:>40}) ==> {middlePairNum:<6}'
 				oddSequences[oddSeqKey] = ["[" + ", ".join(str(num) for num in sequence) + "]", \
 						   				factorsStr, \
-										f'sigma[2,{middlePairNum}²]: {s2}']
+										f'sigma[2,{middlePairNum}²]: {s2s}{spaces}({s2s[-1:]})']
 
 			osqCt += 1
 			if listLen > lMax:
 				lMax = listLen
 		print(f"\nMax length of dictionary entries: {lMax:d}", file=bdo)
 finally:
-	allSeq.close()
+	if not allSeq.closed():
+		allSeq.close()
 
 with open(DIR_TXT+TEST_NODE+"OddSequences.txt","w") as odd:
 	print(f'Report of resultant square numbers with an odd number of n/k pairs:\n', file=odd)
@@ -598,24 +630,30 @@ splits[ct] = time.time()
 print(f"Total Duration {splits[ct] - splits[0]:4.3f} seconds")
 print("Processing complete.")
 
-#n * (n+k) * (n + 2*k) * (n+3*k) + k^4
-# =n* (n+2*k) * (n+k)*(n+3*k) + k^4
-# =(n^2+2*k*n) * (n^2 + 4*k*n + 3*k^2) + k^4
-# =(n^2*n^2 + 2*k*n*n^2) + (4*k*n*n^2 + 4*k*n*2*k*n) + (3*k^2 * n^2 + 3*k^2 * 2*k*n) +k^4
-# =n^4		+ 2*k*n^3	 + 4*k*n^3	  + 8*k^2*n^2	 +	3*k^2*n^2	+ 6*k^3*n		 + k^4
-# =n^4		+ 6*k*n^3				  + 11*k^2n^2					+ 6*k^3*n		 + k^4
-#
-# (n*k + (n+k)^2)^2
-# =(n*k + n^2 + 2*k*n + k^2)^2
-# =(n*k + n^2 + 2*k*n + k^2) * (n*k + n^2 + 2*k*n + k^2)
-# =(n*k*n*k + n^2*n*k + 2*k*n*n*k + k^2*n*k) + (n*k*n^2 + n^2*n^2 + 2*k*n*n^2 + k^2*n^2) + (n*k*2*k*n + n^2*2*k*n + 2*k*n*2*k*n + k^2*2*k*n) + (n*k*k^2 + n^2*k^2 + 2*k*n*k^2) + (k^2*k^2)
-# =(k^2*n^2 + k*n^3 + 2*k^2*n^2 + k^3*n) + (k*n^3 + n^4 + 2*k*n^3 + k^2*n^2) + (2*k^2*n^2 + 2*k*n^3 + 4*k^2*n^2 + 2*k^3*n) + (k^3*n + k^2*n^2 + 2*k^3*n + k^4)
-# =n^4 + (k*n^3 + k*n^3 + 2*k*n^3 + 2*k*n^3) + (k^2n^2 + 2*k^2*n^2 + k^2*n^2 + 2*k^2*n^2 + 4*k^2*n^2 + k^2*n^2) + (k^3*n + 2*k^3*n + k^*n + 2*k^3*n) + k^4
-# =n^4 + 6*k*n^3 + 11*k^2n^2 + 6*k^3*n + k^4
-#
-# (n^2 + 3*k*n + k^2)^2
-# =(n^2 + 3*k*n + k^2) * (n^2 + 3*k*n + k^2)
-# =n^4 + 3*k*n^3 + n^2*k^2 + 3*k*n^3 + 9*k^2*n^2 + 3*k^3*n + k^2+n^2 + 3*k^3*n + k^4
-# =n^4 + (3*k*n^3 + 3*k*n^3) + (n^2*k^2+9*k^2*n^2) + (3*k^3*n + 3*k^3*n) + k^4
-# =n^4 + 6*k*n^3 + 11*k^2*n^2 + 6*k^3*n + k^4
-#
+"""
+Three different ways to calculate a(n) for difference k:
+1:
+n * (n+k) * (n + 2*k) * (n+3*k) + k^4
+ = n* (n+2*k) * (n+k)*(n+3*k) + k^4
+ = (n^2+2*k*n) * (n^2 + 4*k*n + 3*k^2) + k^4
+ = (n^2*n^2 + 2*k*n*n^2) + (4*k*n*n^2 + 4*k*n*2*k*n) + (3*k^2 * n^2 + 3*k^2 * 2*k*n) +k^4
+ = n^4		+ 2*k*n^3	 + 4*k*n^3	  + 8*k^2*n^2	 +	3*k^2*n^2	+ 6*k^3*n		 + k^4
+ = n^4		+ 6*k*n^3				  + 11*k^2n^2					+ 6*k^3*n		 + k^4
+
+2:
+ (n*k + (n+k)^2)^2
+ = (n*k + n^2 + 2*k*n + k^2)^2
+ = (n*k + n^2 + 2*k*n + k^2) * (n*k + n^2 + 2*k*n + k^2)
+ = (n*k*n*k + n^2*n*k + 2*k*n*n*k + k^2*n*k) + (n*k*n^2 + n^2*n^2 + 2*k*n*n^2 + k^2*n^2) + (n*k*2*k*n + n^2*2*k*n + 2*k*n*2*k*n + k^2*2*k*n) + (n*k*k^2 + n^2*k^2 + 2*k*n*k^2) + (k^2*k^2)
+ = (k^2*n^2 + k*n^3 + 2*k^2*n^2 + k^3*n) + (k*n^3 + n^4 + 2*k*n^3 + k^2*n^2) + (2*k^2*n^2 + 2*k*n^3 + 4*k^2*n^2 + 2*k^3*n) + (k^3*n + k^2*n^2 + 2*k^3*n + k^4)
+ = n^4 + (k*n^3 + k*n^3 + 2*k*n^3 + 2*k*n^3) + (k^2n^2 + 2*k^2*n^2 + k^2*n^2 + 2*k^2*n^2 + 4*k^2*n^2 + k^2*n^2) + (k^3*n + 2*k^3*n + k^*n + 2*k^3*n) + k^4
+ = n^4     + 6*k*n^3                 + 11*k^2n^2                   + 6*k^3*n         + k^4
+
+3:
+ (n^2 + 3*k*n + k^2)^2
+ = (n^2 + 3*k*n + k^2) * (n^2 + 3*k*n + k^2)
+ = n^4 + 3*k*n^3 + n^2*k^2 + 3*k*n^3 + 9*k^2*n^2 + 3*k^3*n + k^2+n^2 + 3*k^3*n + k^4
+ = n^4 + (3*k*n^3 + 3*k*n^3) + (n^2*k^2+9*k^2*n^2) + (3*k^3*n + 3*k^3*n) + k^4
+ = n^4    + 6*k*n^3                 + 11*k^2*n^2                  + 6*k^3*n          + k^4
+
+"""

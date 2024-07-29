@@ -486,8 +486,11 @@ try:
 				lMax = listLen
 		print(f"\nMax length of dictionary entries: {lMax:d}", file=bdo)
 finally:
-	if not allSeq.closed():
+	# close allSeq
+	try:
 		allSeq.close()
+	except:
+		pass
 
 with open(DIR_TXT+TEST_NODE+"OddSequences.txt","w") as odd:
 	print(f'Report of resultant square numbers with an odd number of n/k pairs:\n', file=odd)

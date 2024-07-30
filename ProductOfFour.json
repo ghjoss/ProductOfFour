@@ -13,7 +13,7 @@
     },
 
     "output_folder":"Pof4_OUTPUT",
-    "generate_csv_files":false,
+    "generate_csv_files":true,
     "generate_difference_output": true,
     "generate_squares_output": true,
     "generate_txt_files": true,
@@ -26,6 +26,7 @@
     "all_sequences_lines_per_page": 62,
 	"differences_lines_per_page": 50,
 
-    "add_thousands_separator": true
+    "add_thousands_separator": true,
+    "delete_old_output": true
 }
   

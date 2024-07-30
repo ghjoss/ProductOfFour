@@ -22,6 +22,8 @@
 	square roots.
 """
 import os
+import shutil
+import glob
 import errno
 import sys
 import collections
@@ -82,8 +84,31 @@ with open(PATH + "ProductOfFour.json","r") as jsonFile:
 	# a thousands, millions, ... ',' separator.
 	ADD_THOUSANDS_SEPARATOR = settings["add_thousands_separator"]
 
+	DELETE_OLD_OUTPUT = settings["delete_old_output"]
 	ALL_SEQUENCES_PAGES_PER_FILE = settings["all_sequences_pages_per_file"]
 	ALL_SEQUENCES_LINES_PER_PAGE = settings["all_sequences_lines_per_page"]
+
+"""
+	Delete a file cross-platform
+	Args: file_path (str): The path to the file to be deleted
+"""
+def delete_file(file_path):
+	try:
+		if os.path.exists(file_path):
+			if os.path.isfile(file_path):
+				os.remove(file_path)
+			else:
+				pass
+	except OSError as e:
+		print(f"Error deleting file: {e}")
+"""
+Delete files matching a wildcard pattern
+args: pattern (str): the wildcard pattern to match
+"""
+def delete_files_with_wildcard(pattern):
+	files = glob.glob(pattern)
+	for file in files:
+		delete_file(file)
 
 """
 	Function to format numbers with comma separators. This function only does
@@ -148,33 +173,46 @@ oddsDict = {}
 factorsList = []			# list of the prime factors of the square roots
 factorsDict = {}			# dictionary of lists of the prime factors of the square roots
 
-if GENERATE_TXT_FILES:
-	HEADER_TXT = "{0:<8}{1:^30}a(n)^0.5(factors)".format("n","a(n)")
-	HEADER_LTXT = "-" * 72
+"""
+Delete older generated files. Only delete if we are creating new versions.
+While new versions will overwrite older ones, the MAX_DIFFERENCE_FILES
+count may be lower for this run. We want to get rid of the ones that
+were written in an older run but won't be written in this one.
+"""
+if DELETE_OLD_OUTPUT:
+	if GENERATE_CSV_FILES:
+		if GENERATE_DIFFERENCE_OUTPUT:
+			delete_files_with_wildcard(DIR_CSV + TEST_NODE + "Diff*.csv")
+		if GENERATE_SQUARES_OUTPUT:
+			delete_files_with_wildcard(DIR_CSV + TEST_NODE + "squares*.csv")
+	if GENERATE_TXT_FILES:
+		if GENERATE_DIFFERENCE_OUTPUT:
+			delete_files_with_wildcard(DIR_TXT + TEST_NODE + "Diff*.txt")
+		if GENERATE_SQUARES_OUTPUT:
+			delete_files_with_wildcard(DIR_TXT + TEST_NODE + "squares*.txt")
 
-# the difference between successive integers in the product of four integers is represented by the
-# variable 'difference'. These differences will be iterated from 1 through DIFFERENCE_MAX. The program will 
-# calculate a(n) for each difference iterated up to START_OF_PROGRESSION_MAX calculations per difference.
+"""
+ the difference between successive integers in the product of four integers is represented by the
+ variable 'difference'. These differences will be iterated from 1 through DIFFERENCE_MAX. The program will 
+ calculate a(n) for each difference iterated up to START_OF_PROGRESSION_MAX calculations per difference.
+ """
 for difference in range(1,DIFFERENCE_MAX):
-	# to the product of four integers separated by 'difference' will be added difference to the 4th power
-	# this will make the product + the 4th power of difference a perfect square integer.
-	inc4 = difference ** 4
+	""" 
+	 to the product of four integers separated by 'difference' will be added difference to the 4th power
+	 this will make the product + the 4th power of difference a perfect square integer.
+	"""
+	difference_4 = difference ** 4
 	sqrtModList = []	# list of the first <difference> values of <difference> mod(square-root-of calculated integer)
 	numModList = []		# list of the first <difference> values of <difference> mod(calculated integer)
 
-	# for this difference, determine and print the headers.
-	HEADER_0 = "difference == {0:d}".format(difference)
-	HEADER_1 = "a(n) == (n x (n+{0:d}) x (n+{1:d}) x (n+{2:d}) + {3:d})".format(difference,2*difference,3*difference,inc4) + " -or- a(n) == (n x {0:d} + (n + {0:d})²)²".format(difference)
-
-	# headers for .CSV file (spreadsheet)
 	if GENERATE_CSV_FILES and GENERATE_DIFFERENCE_OUTPUT and difference <= MAX_DIFFERENCE_FILES:
-		HDR_1 = ["n","a(n)","(a(n))^.5","S[n]^2","S[n]","(S[n]+(a(n))^.5)/2","(S[n]+(a(n))^.5)/2)^.5"]
-		HDR_2 = "factor"
-		HEADER_CSV = HDR_1 + [HDR_2]*13 + [f"  difference=={difference:.0f}  S[n]=(a(n)+a(n-{difference:.0f})+a(n-{2*difference:.0f})/3)^.5"]
+
 		# open the report for output
 		fCSV = open(DIR_CSV + TEST_NODE+'Diff_'+str(difference)+'.csv', 'w',newline='')
 		writer = csv.writer(fCSV)
-		writer.writerow(HEADER_CSV)
+		writer.writerow(["n","a(n)","(a(n))^.5","S[n]^2","S[n]","(S[n]+(a(n))^.5)/2","(S[n]+(a(n))^.5)/2)^.5"] + \
+			["factor"] * 13 + \
+			[f"  difference=={difference:.0f}  S[n]=(a(n)+a(n-{difference:.0f})+a(n-{2*difference:.0f})/3)^.5"])
 
 	if GENERATE_TXT_FILES:
 		primeRoots = 0
@@ -183,12 +221,13 @@ for difference in range(1,DIFFERENCE_MAX):
 
 		if GENERATE_DIFFERENCE_OUTPUT and difference <= MAX_DIFFERENCE_FILES:
 			fTXT = open(DIR_TXT + TEST_NODE+'Diff_'+str(difference)+'.txt', 'w') # for running on laptop machine
-
-	# loop through the first "startOfSequenceMax" integers, calculating the product of four integers that are
-	# in an arithmetic progression, separated by the current "difference" value.
-	# Note that analysis has shown that the square root of the product for the current index (== n) can
-	# be calculated as the sum: (n + (i+difference)**2). This is probably faster than doing the product and then 
-	# taking the square root.
+	""" 
+		loop through the first "startOfSequenceMax" integers, calculating the product of four integers that are
+		in an arithmetic progression, separated by the current "difference" value.
+		Note that analysis has shown that the square root of the product for the current index (== n) can
+		be calculated as the sum: (n + (i+difference)**2). This is probably faster than doing the product and then 
+		taking the square root.
+	"""
 	for startInteger in range(1,START_OF_PROGRESSION_MAX):
 		factorsList = []
 		# the text file output header is printed every 45 lines.
@@ -196,15 +235,18 @@ for difference in range(1,DIFFERENCE_MAX):
 			if startInteger % DIFFERENCES_LINES_PER_PAGE == 1:
 					if startInteger > 1:
 						print("", file=fTXT)
-					print(HEADER_LTXT, file=fTXT)
-					print(HEADER_0, file=fTXT)
-					print(HEADER_1, file=fTXT)
-					print(HEADER_TXT, file=fTXT)
-					print(HEADER_LTXT, file=fTXT)
+					print("-"*72, file=fTXT)
+					print("difference == {0:d}".format(difference), file=fTXT)
+					print("a(n) == (n x (n+{0:d}) x (n+{1:d}) x (n+{2:d}) + {3:d})".format(difference,2*difference,3*difference,difference_4) + \
+		   				" -or- a(n) == (n x {0:d} + (n + {0:d})²)²".format(difference), file=fTXT)
+					print("{0:<8}{1:^30}a(n)^0.5(factors)".format("n","a(n)"), file=fTXT)
+					print("-"*72, file=fTXT)
 
-		# squareNum = n * (n + difference) * (n + 2*difference) * (n + 3*difference) + difference**4
-		# factorizationTestNum = sqrtNum = a(n) ** 0.5
-		# alternative, equivalent values
+		"""
+	 		squareNum = n * (n + difference) * (n + 2*difference) * (n + 3*difference) + difference**4
+			factorizationTestNum = sqrtNum = a(n) ** 0.5
+			alternative, equivalent values
+		 """
 		i1Sum = startInteger + difference
 		factorizationTestNum = sqrtNum = startInteger*difference + i1Sum * i1Sum  #factorizationTestNum = sqrtNum = i*difference + (i+difference)²
 		# squareNum = (iProd + i1Sum**2)**2
@@ -214,10 +256,11 @@ for difference in range(1,DIFFERENCE_MAX):
 		if startInteger <= difference and difference > 1:
 			sqrtModList.append(sqrtNum % difference)
 			numModList.append(squareNum % difference)
-
-		# when n (startInteger) and k (difference) are equal, then this is the middle pair of a
-		# sequence of pairs that generate the same a(n). THis is therefore part of an odd number
-		# such pairs.
+		""" 
+			when n (startInteger) and k (difference) are equal, then this is the middle pair of a
+			sequence of pairs that generate the same a(n). THis is therefore part of an odd number
+			such pairs.
+		"""
 		if startInteger == difference:
 			oddsDict[squareNum] = [startInteger]
 
@@ -249,10 +292,12 @@ for difference in range(1,DIFFERENCE_MAX):
 				sqrtFactorizationTestNum = sqrtNum ** 0.5  # max value to test
 				while j < MAX_PRIME and breakJ == 0:
 					p = _100KPrimes.primes[j]
-					# There is no need to continue trying to find factors of the current
-					# test number if we have not found one yet and the next prime > square
-					# root of the test number or if the test number is in the table of
-					# primes.
+					""" 
+						There is no need to continue trying to find factors of the current
+						test number if we have not found one yet and the next prime > square
+						root of the test number or if the test number is in the table of
+						primes.
+					 """
 					if p > sqrtFactorizationTestNum or factorizationTestNum in primesDict:
 						factorsList.append(factorizationTestNum)
 						if GENERATE_TXT_FILES and factorizationTestNum >= maxRootFactor:
@@ -609,13 +654,13 @@ if GENERATE_TXT_FILES and GENERATE_SQUARES_OUTPUT:
 				i3 = vTXT2[idx+4]
 				inc3 = vTXT2[idx+5]
 				i4 = vTXT2[idx+6]
-				inc4 = vTXT2[idx+7]
+				difference_4 = vTXT2[idx+7]
 
 				if idx == 0:
-					numSqrt = ast+"{0:^30}".format("{0}({1})".format(squareNum, sqrt))+"{0:^15}{1:^10}{2:^15}{3:^10}{4:^15}{5:^10}{6:^15}{7:^10}".format(i1Sum, inc1, i2,inc2, i3, inc3, i4, inc4)
+					numSqrt = ast+"{0:^30}".format("{0}({1})".format(squareNum, sqrt))+"{0:^15}{1:^10}{2:^15}{3:^10}{4:^15}{5:^10}{6:^15}{7:^10}".format(i1Sum, inc1, i2,inc2, i3, inc3, i4, difference_4)
 					print("{0:s}{1:s}".format(numSqrt,factors),file=fsqTXT)
 				else:
-					numSqrt = " {: <30}".format(" ")+"{0:^15}{1:^10}{2:^15}{3:^10}{4:^15}{5:^10}{6:^15}{7:^10}".format(i1Sum, inc1, i2, inc2, i3, inc3, i4,inc4)
+					numSqrt = " {: <30}".format(" ")+"{0:^15}{1:^10}{2:^15}{3:^10}{4:^15}{5:^10}{6:^15}{7:^10}".format(i1Sum, inc1, i2, inc2, i3, inc3, i4,difference_4)
 					print(f"{numSqrt:s}", file=fsqTXT)
 		except IndexError:
 			print("Index out of range")

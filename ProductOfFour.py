@@ -85,7 +85,6 @@ with open(PATH + "ProductOfFour.json","r") as jsonFile:
 	# a thousands, millions, ... ',' separator.
 	ADD_THOUSANDS_SEPARATOR = settings["add_thousands_separator"]
 
-	DELETE_OLD_OUTPUT = settings["delete_old_output"]
 	ALL_SEQUENCES_PAGES_PER_FILE = settings["all_sequences_pages_per_file"]
 	ALL_SEQUENCES_LINES_PER_PAGE = settings["all_sequences_lines_per_page"]
 
@@ -102,14 +101,6 @@ def delete_file(file_path):
 				pass
 	except OSError as e:
 		print(f"Error deleting file: {e}")
-"""
-Delete files matching a wildcard pattern
-args: pattern (str): the wildcard pattern to match
-"""
-def delete_files_with_wildcard(pattern):
-	files = glob.glob(pattern)
-	for file in files:
-		delete_file(file)
 
 """
 	Function to format numbers with comma separators. This function only does
@@ -194,22 +185,18 @@ factorsList = []			# list of the prime factors of the square roots
 factorsDict = {}			# dictionary of lists of the prime factors of the square roots
 
 """
-Delete older generated files. Only delete if we are creating new versions.
-While new versions will overwrite older ones, the MAX_DIFFERENCE_FILES
-count may be lower for this run. We want to get rid of the ones that
-were written in an older run but won't be written in this one.
+Delete older generated files. 
 """
-if DELETE_OLD_OUTPUT:
-	if GENERATE_CSV_FILES:
-		if GENERATE_DIFFERENCE_OUTPUT:
-			delete_file(DIR_CSV + TEST_NODE + "CSV_Diff.zip")
-		if GENERATE_SQUARES_OUTPUT:
-			delete_file(DIR_CSV + TEST_NODE + "CSV_squares.zip")
-	if GENERATE_TXT_FILES:
-		if GENERATE_DIFFERENCE_OUTPUT:
-			delete_file(DIR_TXT + TEST_NODE + "TXT_Diff.zip")
-		if GENERATE_SQUARES_OUTPUT:
-			delete_file(DIR_TXT + TEST_NODE + "TXT_squares.zip")
+if GENERATE_CSV_FILES:
+	if GENERATE_DIFFERENCE_OUTPUT:
+		delete_file(DIR_CSV + TEST_NODE + "CSV_Diff.zip")
+	if GENERATE_SQUARES_OUTPUT:
+		delete_file(DIR_CSV + TEST_NODE + "CSV_squares.zip")
+if GENERATE_TXT_FILES:
+	if GENERATE_DIFFERENCE_OUTPUT:
+		delete_file(DIR_TXT + TEST_NODE + "TXT_Diff.zip")
+	if GENERATE_SQUARES_OUTPUT:
+		delete_file(DIR_TXT + TEST_NODE + "TXT_squares.zip")
 
 """
  the difference between successive integers in the product of four integers is represented by the

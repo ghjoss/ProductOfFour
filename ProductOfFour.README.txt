@@ -66,10 +66,5 @@ DEBUG mode or not. All other values are set in both DEBUG and max mode.
 "add_thousands_separator"
                         true: add commas(,) as separators for numbers > 1000
 
-"delete_old_output"
-                        true: Delete older generated files. Only delete if we are creating new versions.
-                              While new versions will overwrite older ones, the MAX_DIFFERENCE_FILES
-                              count may be lower for this run. We want to get rid of the ones that
-                              were written in an older run but won't be written in this one.
                               
 

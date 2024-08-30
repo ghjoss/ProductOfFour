@@ -30,6 +30,7 @@ import collections
 import time
 import csv
 import json
+import zipfile
 
 splits = {}
 splits[0] = time.time()
@@ -133,6 +134,10 @@ except OSError as error:
 
 DIR_CSV = OUTPUT_DIR + "/"
 DIR_TXT = OUTPUT_DIR + "/"
+ZIP_MODE_CSVDIFF = "w" # write to create a new zipfile, "a" (append) to add to existing zipfile
+ZIP_MODE_TXTDIFF = "w"
+ZIP_MODE_CSVSQ = "w"
+ZIP_MODE_TXTSQ = "w"
 
 if not GENERATE_CSV_FILES and not GENERATE_TXT_FILES:
 	print("Check the file ProductOf_Four.json:\n" \
@@ -142,6 +147,11 @@ if not GENERATE_DIFFERENCE_OUTPUT and not GENERATE_SQUARES_OUTPUT:
 	print("Check the file ProductOfFour.json:\n"
 	   "Either of the values generate_difference_output and generate_squares_output \n (or both) must be true. Both were 'false'.")
 	exit()
+zipCSVDIFF = True if GENERATE_CSV_FILES and GENERATE_DIFFERENCE_OUTPUT else False
+zipTXTDIFF = True if GENERATE_TXT_FILES and GENERATE_DIFFERENCE_OUTPUT else False
+zipCSVSQ = True if GENERATE_CSV_FILES and GENERATE_SQUARES_OUTPUT else False
+zipTXTSQ = True if GENERATE_TXT_FILES and GENERATE_SQUARES_OUTPUT else False
+
 # Prime lists, _100KPrimes or _50KPrimes
 sys.path.append('.')
 
@@ -192,14 +202,14 @@ were written in an older run but won't be written in this one.
 if DELETE_OLD_OUTPUT:
 	if GENERATE_CSV_FILES:
 		if GENERATE_DIFFERENCE_OUTPUT:
-			delete_files_with_wildcard(DIR_CSV + TEST_NODE + "Diff*.csv")
+			delete_file(DIR_CSV + TEST_NODE + "CSV_Diff.zip")
 		if GENERATE_SQUARES_OUTPUT:
-			delete_files_with_wildcard(DIR_CSV + TEST_NODE + "squares*.csv")
+			delete_file(DIR_CSV + TEST_NODE + "CSV_squares.zip")
 	if GENERATE_TXT_FILES:
 		if GENERATE_DIFFERENCE_OUTPUT:
-			delete_files_with_wildcard(DIR_TXT + TEST_NODE + "Diff*.txt")
+			delete_file(DIR_TXT + TEST_NODE + "TXT_Diff.zip")
 		if GENERATE_SQUARES_OUTPUT:
-			delete_files_with_wildcard(DIR_TXT + TEST_NODE + "squares*.txt")
+			delete_file(DIR_TXT + TEST_NODE + "TXT_squares.zip")
 
 """
  the difference between successive integers in the product of four integers is represented by the
@@ -218,7 +228,9 @@ for difference in range(1,DIFFERENCE_MAX):
 	if GENERATE_CSV_FILES and GENERATE_DIFFERENCE_OUTPUT and difference <= MAX_DIFFERENCE_FILES:
 
 		# open the report for output
-		fCSV = open(DIR_CSV + TEST_NODE+'Diff_'+str(difference)+'.csv', 'w',newline='')
+		CSV_File_Name = f'Diff_{difference}.csv'
+		CSV_File_Path = f'{DIR_CSV}{TEST_NODE}{CSV_File_Name}'
+		fCSV = open(CSV_File_Path, 'w',newline='')
 		writer = csv.writer(fCSV)
 		writer.writerow(["n","a(n)","(a(n))^.5","S[n]^2","S[n]","(S[n]+(a(n))^.5)/2","(S[n]+(a(n))^.5)/2)^.5"] + \
 			["factor"] * 13 + \
@@ -230,7 +242,9 @@ for difference in range(1,DIFFERENCE_MAX):
 		maxNum = 0
 
 		if GENERATE_DIFFERENCE_OUTPUT and difference <= MAX_DIFFERENCE_FILES:
-			fTXT = open(DIR_TXT + TEST_NODE+'Diff_'+str(difference)+'.txt', 'w') # for running on laptop machine
+			TXT_File_Name = f'Diff_{difference}.txt'
+			TXT_File_Path = DIR_TXT + TEST_NODE+'Diff_'+str(difference)+'.txt'
+			fTXT = open(TXT_File_Path, 'w') # for running on laptop machine
 	""" 
 		loop through the first "startOfSequenceMax" integers, calculating the product of four integers that are
 		in an arithmetic progression, separated by the current "difference" value.
@@ -434,8 +448,16 @@ for difference in range(1,DIFFERENCE_MAX):
 
 	if GENERATE_CSV_FILES and GENERATE_DIFFERENCE_OUTPUT and difference <= MAX_DIFFERENCE_FILES:
 		fCSV.close()
+		with zipfile.ZipFile(DIR_CSV + TEST_NODE + "CSV_Diff.zip",ZIP_MODE_CSVDIFF) as zipf:
+			zipf.write(CSV_File_Path,arcname=CSV_File_Name)
+			delete_file(CSV_File_Path)
+		ZIP_MODE_CSVDIFF = "a" # append from here on out
 	if GENERATE_TXT_FILES and GENERATE_DIFFERENCE_OUTPUT and difference <= MAX_DIFFERENCE_FILES:
 		fTXT.close()
+		with zipfile.ZipFile(DIR_TXT + TEST_NODE + "TXT_Diff.zip",ZIP_MODE_TXTDIFF) as zipf:
+			zipf.write(TXT_File_Path,arcname=TXT_File_Name)
+			delete_file(TXT_File_Path)
+		ZIP_MODE_TXTDIFF = "a" # append from here on out
 
 	ct = len(splits)
 	splits[ct] = time.time()
@@ -473,14 +495,17 @@ allSeqFiles = 1
 allSeqPages = 1
 allSeqHdr1 = "a(n)(sq.rt)" + " " * 29 + "Odd    [n1,k1,n2,k2,...,k1,n1]" + " " * 34 + "Factors of sq.rt." + " " * 44 + "sigma[2,n²]"
 allSeqHdr0 = "-" * 192
-
-allSeq = open(DIR_TXT+TEST_NODE+"allSequences"+str(allSeqFiles)+".txt","w")
+allSeq_File_Name = f'allSequences{allSeqFiles}.txt'
+allSeq_File_Path = f'{DIR_TXT}{TEST_NODE}{allSeq_File_Name}'
+allSeq = open(allSeq_File_Path,"w")
 
 print(f'{allSeqHdr0}\n{allSeqHdr1}\n{allSeqHdr0}',file=allSeq)
 allSeqLines = 3
 evenCt = 0
 try:
-	with open(DIR_TXT+TEST_NODE+"bigdictionary.txt","w") as bdo:
+	bigDict_File_Name = "bigdictionary.txt"
+	bigDict_File_Path = f'{DIR_TXT}{TEST_NODE}{bigDict_File_Name}'
+	with open(bigDict_File_Path,"w") as bdo:
 		for o in osq:
 			listLen = int((len(osq[o]) - 2))
 			print(listLen, ":", osq[o][:2], osq[o][2:], file=bdo)
@@ -519,8 +544,13 @@ try:
 				if allSeqPages >= ALL_SEQUENCES_PAGES_PER_FILE:
 					allSeqLines = 0
 					allSeq.close()
+					with zipfile.ZipFile(DIR_TXT + TEST_NODE + 'TXT_Diff.zip',ZIP_MODE_TXTDIFF) as zipf:
+						zipf.write(allSeq_File_Path,arcname=allSeq_File_Name)
+						delete_file(allSeq_File_Path)
 					allSeqFiles += 1
-					allSeq = open(DIR_TXT+TEST_NODE+"allSequences"+str(allSeqFiles)+".txt","w")
+					allSeq_File_Name = f'allSequences{allSeqFiles}.txt'
+					allSeq_File_Path = f'{DIR_TXT}{TEST_NODE}{allSeq_File_Name}'
+					allSeq = open(allSeq_File_Path,"w")
 					allSeqPages = 1
 				print(f'\n{allSeqHdr0}\n{allSeqHdr1}\n{allSeqHdr0}',file=allSeq)
 				allSeqLines += 5
@@ -546,10 +576,17 @@ finally:
 	# close allSeq
 	try:
 		allSeq.close()
+		with zipfile.ZipFile(DIR_TXT + TEST_NODE + 'TXT_Diff.zip',ZIP_MODE_TXTDIFF) as zipf:
+			zipf.write(allSeq_File_Path,arcname=allSeq_File_Name)
+			delete_file(allSeq_File_Path)
+		with zipfile.ZipFile(DIR_TXT + TEST_NODE + 'TXT_Diff.zip', ZIP_MODE_TXTDIFF) as zipf:
+			zipf.write(bigDict_File_Path,arcname=bigDict_File_Name)
+			delete_file(bigDict_File_Path)
 	except:
 		pass
-
-with open(DIR_TXT+TEST_NODE+"OddSequences.txt","w") as odd:
+ODDSEQ_File_Name = f'OddSequences.txt'
+ODDSEQ_File_Path = f'{DIR_TXT}{TEST_NODE}{ODDSEQ_File_Name}'
+with open(ODDSEQ_File_Path,"w") as odd:
 	print(f'Report of resultant square numbers with an odd number of n/k pairs:\n', file=odd)
 	for k,v in oddSequences.items():
 		kv = f'{k}: {v[0]}'
@@ -559,6 +596,10 @@ with open(DIR_TXT+TEST_NODE+"OddSequences.txt","w") as odd:
 		print(f'{v[2]}',file=odd)
 	if osqCt == 0:
 		print("No data", file=bdo)
+if osqCt > 0:
+	with zipfile.ZipFile(f'{DIR_TXT}{TEST_NODE}TXT_Diff.zip',ZIP_MODE_TXTDIFF) as zipf:
+		zipf.write(ODDSEQ_File_Path,arcname=ODDSEQ_File_Name)
+		delete_file(ODDSEQ_File_Path)
 
 if GENERATE_CSV_FILES and GENERATE_SQUARES_OUTPUT:
 	print("Squares analysis .csv sheets")
@@ -579,9 +620,15 @@ if GENERATE_CSV_FILES and GENERATE_SQUARES_OUTPUT:
 		if outputLineCount % 250000 == 1:
 			if outputLineCount != 1:
 				fsqCSV.close()
-			fName = TEST_NODE+"squares_"+str(fileNo)+".csv"
-			print(f"Processing {fName}")
-			fsqCSV = open(DIR_CSV + fName,"w",newline='')
+				with zipfile.ZipFile(f'{DIR_CSV}{TEST_NODE}CSV_Squares.zip',ZIP_MODE_CSVSQ) as zipf:
+					zipf.write(CSV_File_Path,arcname=CSV_File_Name)
+					delete_file(CSV_File_Path)
+					ZIP_MODE_CSVSQ = 'a'
+
+			CSV_File_Name = f'squares_{fileNo}.csv'
+			CSV_File_Path = f'{DIR_CSV}{TEST_NODE}{CSV_File_Name}'
+			print(f"Processing {CSV_File_Name}")
+			fsqCSV = open(CSV_File_Path,"w",newline='')
 			writer = csv.writer(fsqCSV)
 			writer.writerow(fullHdr)
 			fileNo += 1
@@ -596,6 +643,9 @@ if GENERATE_CSV_FILES and GENERATE_SQUARES_OUTPUT:
 	ct2 = len(splits)
 	splits[ct2] = time.time()
 	fsqCSV.close()
+	with zipfile.ZipFile(f'{DIR_CSV}{TEST_NODE}CSV_Squares.zip',ZIP_MODE_CSVSQ) as zipf:
+		zipf.write(CSV_File_Path,arcname=CSV_File_Name)
+		delete_file(CSV_File_Path)
 	print(f".csv analysis duration {splits[ct2] - splits[ct]:4.3f} seconds")
 
 if GENERATE_TXT_FILES and GENERATE_SQUARES_OUTPUT:
@@ -623,10 +673,15 @@ if GENERATE_TXT_FILES and GENERATE_SQUARES_OUTPUT:
 			if pages % SQUARES_PAGES_PER_FILE == 1:
 				if pages > 1:
 					fsqTXT.close()
+					with zipfile.ZipFile(f'{DIR_CSV}{TEST_NODE}TXT_Squares.zip',ZIP_MODE_TXTSQ) as zipf:
+						zipf.write(TXT_File_Path,arcname=TXT_File_Name)
+						delete_file(TXT_File_Path)
+						ZIP_MODE_TXTSQ = 'a'
 				files += 1
-				fName = TEST_NODE+"squares"+f'{files}'+".txt"
-				print(f"Processing {fName}")
-				fsqTXT = open(DIR_TXT + fName,"w")
+				TXT_File_Name = f'squares{files}.txt'
+				TXT_File_Path = f'{DIR_TXT}{TEST_NODE}{TXT_File_Name}'
+				print(f"Processing {TXT_File_Name}")
+				fsqTXT = open(TXT_File_Path,"w")
 			if lines != 0:
 				print("", file=fsqTXT)
 			print(headerL, file=fsqTXT)
@@ -680,6 +735,10 @@ if GENERATE_TXT_FILES and GENERATE_SQUARES_OUTPUT:
 			sys.exit()
 
 		lines += 1
+	fsqTXT.close()
+	with zipfile.ZipFile(f'{DIR_CSV}{TEST_NODE}TXT_Squares.zip',ZIP_MODE_TXTSQ) as zipf:
+		zipf.write(TXT_File_Path,arcname=TXT_File_Name)
+		delete_file(TXT_File_Path)
 	splits[len(splits)] = time.time()
 	ct2 = len(splits)
 	splits[ct2] = time.time()

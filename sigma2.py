@@ -10,15 +10,9 @@ def unique_combinations(items):
 def AppendDictionary(L, newDict, index):
 	L[index].append(newDict)
 
-def divisors(num):
-	numSq = num ** 2
-	
-	return [d for d in range(1,numSq+1) if numSq%d == 0]
-
-def sigma_2(num,divisors):
-	numSq = num ** 2
-	sig2 = sum(d**2 for d in divisors)
-	return sig2
+def sigma_2(num): 
+	divisors = [d for d in range(1,num+1) if num%d == 0]
+	return sum(d*d for d in divisors)
 
 def create_list_of_lists(num_lists):
   """Creates a list of lists with a specified number of sublists.
@@ -29,40 +23,31 @@ def create_list_of_lists(num_lists):
   Returns:
     A list of lists.
   """
-
   result = []
   for _ in range(num_lists):
     result.append([])
   return result
 
 m2 = create_list_of_lists(10)
-for i in range(1,30):
-	if i % 50 == 0:
-		print(i)
-	d = divisors(i)
-	#print(d)
-	newDivisors = unique_combinations(d)[-1]
-	product = 1
-	for divItem in newDivisors:
-		product *= divItem
-	print(f'{i}:{product} ')
-	s2 = sigma_2(i,d)
+for i in range(1,2001):
+	print(i)
+	s2 = sigma_2(i*i)
+	s = sigma_2(i)
 	s2m = s2 % 10
-	AppendDictionary(m2,{i:s2},s2m)
+	sm = s % 10
+	AppendDictionary(m2,{i:f'{s2}({s})'},s2m)
 
-# with open("sigma2.out","w") as f:
-	# print(f'sigma[2,n] mod 10',file=f)
-	# for i in range (0,10):
-		# print(i,file=f)
-		# for d in m2[i]:
-			# print(d,file=f)
-
-
-# print(sigma_2(11))
-# print(sigma_2(121))
-# print(sigma_2(122))
-# print(sigma_2(29))
-# print(sigma_2(4205))
-
-# print(sigma_2(11))
-# print(sigma_2(605))
+with open("sigma2.out","w") as f:
+	cbs = r'{'
+	cbe = r'}'
+	hdr = f"{cbs}n: 'sigma[2,n²](sigma[2,n])'{cbe} mod 10"
+	print(hdr,file=f)
+	lines = 1
+	for i in range (0,10):
+		print(f'{i}: count={len(m2[i])}',file=f)
+		lines += 1
+		for d in m2[i]:
+			print(d,file=f)
+			lines += 1
+			if lines % 50 == 0:
+				print(hdr,file=f)

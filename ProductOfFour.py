@@ -151,11 +151,21 @@ sys.path.append('.')
 	of the passed number squared. Example: for num=2, num² = 4. Divisors
 	of 4 are 1, 2 and 4. Squares of the divisors: 1, 4, 16. Sum=21.
 	Thus sigma_2(4) = 21
+	Args: num (this number is squared in the function before taking the divisors)
+	For even numbers divisors are num and the rest are <= num/2 
+	FOr odd numbers the divisors are num and the rest are <= num/3.
 """
+# σ₂(n²)
 def sigma_2(num):
-	numSq = num * num
-	divisors = [d for d in range(1,numSq+1) if numSq%d == 0]
-	return sum(d**2 for d in divisors)
+	num_2 = num * num
+	sum = 0
+	for d in range(1,num+1):
+		if num_2%d == 0:
+			sum += d*d
+			d = int(num_2/d)
+			if d != num:
+				sum += d * d
+	return sum
 
 import _100KPrimes				#100,000 prime numbers in a list named "primes"
 # maxPrime: in the array of primes, this is the offset of the last
@@ -461,14 +471,14 @@ oddSequences = {}
 
 allSeqFiles = 1
 allSeqPages = 1
-allSeqHdr1 = "a(n)(sq.rt)"+" "*29 + "Odd    [n1,k1,n2,k2,...,k1,n1]" + " " * 34 + "Factors" + " " * 54 + "sigma[2,n²]"
+allSeqHdr1 = "a(n)(sq.rt)" + " " * 29 + "Odd    [n1,k1,n2,k2,...,k1,n1]" + " " * 34 + "Factors of sq.rt." + " " * 44 + "sigma[2,n²]"
 allSeqHdr0 = "-" * 192
 
 allSeq = open(DIR_TXT+TEST_NODE+"allSequences"+str(allSeqFiles)+".txt","w")
 
 print(f'{allSeqHdr0}\n{allSeqHdr1}\n{allSeqHdr0}',file=allSeq)
 allSeqLines = 3
-
+evenCt = 0
 try:
 	with open(DIR_TXT+TEST_NODE+"bigdictionary.txt","w") as bdo:
 		for o in osq:
@@ -485,9 +495,11 @@ try:
 				s2 = sigma_2(middlePairNum)
 				s2s = str(s2)
 				spaces = " " * (26 - len(s2s) - len(str(middlePairNum)))
-				pr = f'sigma[2,{middlePairNum}²]: {s2s}{spaces}({s2s[-1:]})'
+				pr = f'sigma[2,{middlePairNum}²]: {s2s}{spaces}({s2s[-1:]}) - {evenCt}'
 				dot = "."
+				evenCt = 0
 			else:
+				evenCt += 1
 				pr = ""
 				dot = " "
 			R =FormatWithCommas(osq[o][0])+"("+FormatWithCommas(osq[o][1])+")"

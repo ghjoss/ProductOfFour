@@ -24,7 +24,10 @@ ProductOfFour.py is a python program to calculate these squares for all starting
 in a parameters file, ProductOfFour.json. All progressive differences from 1 to to a difference(increment) 
 specified in the parameters file. It runs for about 17 minutes on a PC with a core i7 CPU running at 2.4Ghz. The program 
 can generate over 5000 files, but the maximum number of files can be limited by a setting in the 
-parameters file. For each of the differences there are two files generated. One of these files is a .csv file 
+parameters file. The generated files are stored in .zip archives to save disk space. After being stored in an archive,
+each generated file is deleted.
+
+For each of the differences there are two files generated. One of these files is a .csv file 
 and one is a simple text file. The file names start with "Diff_" and denote the difference. Thus for a difference 
 of 1, the files are Diff_1.csv and Diff_1.txt.
 

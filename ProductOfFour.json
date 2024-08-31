@@ -18,7 +18,7 @@
     "generate_squares_output": true,
     "generate_txt_files": true,
 
-    "max_difference_files": 100,
+    "max_difference_files": 500,
 
     "squares_pages_per_file": 1000,
     "all_sequences_pages_per_file": 1000,
@@ -26,6 +26,6 @@
     "all_sequences_lines_per_page": 62,
 	"differences_lines_per_page": 50,
 
-    "add_thousands_separator": true,
+    "add_thousands_separator": true
 }
   

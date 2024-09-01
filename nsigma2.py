@@ -1,5 +1,21 @@
 import itertools
 import math
+import zipfile
+import os
+"""
+	Delete a file cross-platform
+	Args: file_path (str): The path to the file to be deleted
+"""
+def delete_file(file_path):
+	try:
+		if os.path.exists(file_path):
+			if os.path.isfile(file_path):
+				os.remove(file_path)
+			else:
+				pass
+	except OSError as e:
+		print(f"Error deleting file: {e}")
+
 """ 
 def unique_combinations(items):
 	unique_combinations = []
@@ -93,3 +109,6 @@ with open("nsigma2.out","w") as f:
 			lines += 1
 			if lines % 50 == 0:
 				print(hdr,file=f)
+with zipfile.ZipFile("nsigma2.zip","w") as zipf:
+	zipf.write("nsigma2.out",arcname="nsigma2.out")
+	delete_file("nsigma2.out")

@@ -436,13 +436,13 @@ for difference in range(1,DIFFERENCE_MAX):
 
 	if GENERATE_CSV_FILES and GENERATE_DIFFERENCE_OUTPUT and difference <= MAX_DIFFERENCE_FILES:
 		fCSV.close()
-		with zipfile.ZipFile(f'{DIR_ZIP}CSV_Diff.zip',zip_mode_csvDiff) as zipf:
+		with zipfile.ZipFile(f'{DIR_ZIP}CSV_Diff.zip',zip_mode_csvDiff,compression=zipfile.ZIP_DEFLATED,compresslevel=9) as zipf:
 			zipf.write(CSV_File_Path,arcname=CSV_File_Name)
 			delete_file(CSV_File_Path)
 		zip_mode_csvDiff = "a" # append from here on out
 	if GENERATE_TXT_FILES and GENERATE_DIFFERENCE_OUTPUT and difference <= MAX_DIFFERENCE_FILES:
 		fTXT.close()
-		with zipfile.ZipFile(f'{DIR_ZIP}TXT_Diff.zip',zip_mode_txtDiff) as zipf:
+		with zipfile.ZipFile(f'{DIR_ZIP}TXT_Diff.zip',zip_mode_txtDiff,compression=zipfile.ZIP_DEFLATED,compresslevel=9) as zipf:
 			zipf.write(TXT_File_Path,arcname=TXT_File_Name)
 			delete_file(TXT_File_Path)
 		zip_mode_txtDiff = "a" # append from here on out
@@ -535,7 +535,7 @@ try:
 				if allSeqPages >= ALL_SEQUENCES_PAGES_PER_FILE:
 					allSeqLines = 0
 					allSeq.close()
-					with zipfile.ZipFile(f'{DIR_ZIP}TXT_Diff.zip',zip_mode_txtDiff) as zipf:
+					with zipfile.ZipFile(f'{DIR_ZIP}TXT_Diff.zip',zip_mode_txtDiff,compression=zipfile.ZIP_DEFLATED,compresslevel=9) as zipf:
 						zipf.write(allSeq_File_Path,arcname=allSeq_File_Name)
 						delete_file(allSeq_File_Path)
 					allSeqFiles += 1
@@ -567,10 +567,10 @@ finally:
 	# close allSeq
 	try:
 		allSeq.close()
-		with zipfile.ZipFile(f'{DIR_ZIP}TXT_Diff.zip',zip_mode_txtDiff) as zipf:
+		with zipfile.ZipFile(f'{DIR_ZIP}TXT_Diff.zip',zip_mode_txtDiff,compression=zipfile.ZIP_DEFLATED,compresslevel=9) as zipf:
 			zipf.write(allSeq_File_Path,arcname=allSeq_File_Name)
 			delete_file(allSeq_File_Path)
-		with zipfile.ZipFile(f'{DIR_ZIP}TXT_Diff.zip', zip_mode_txtDiff) as zipf:
+		with zipfile.ZipFile(f'{DIR_ZIP}TXT_Diff.zip', zip_mode_txtDiff,compression=zipfile.ZIP_DEFLATED,compresslevel=9) as zipf:
 			zipf.write(bigDict_File_Path,arcname=bigDict_File_Name)
 			delete_file(bigDict_File_Path)
 	except:
@@ -588,7 +588,7 @@ with open(ODDSEQ_File_Path,"w") as odd:
 	if osqCt == 0:
 		print("No data", file=bdo)
 if osqCt > 0:
-	with zipfile.ZipFile(f'{DIR_ZIP}TXT_Diff.zip',zip_mode_txtDiff) as zipf:
+	with zipfile.ZipFile(f'{DIR_ZIP}TXT_Diff.zip',zip_mode_txtDiff,compression=zipfile.ZIP_DEFLATED,compresslevel=9) as zipf:
 		zipf.write(ODDSEQ_File_Path,arcname=ODDSEQ_File_Name)
 		delete_file(ODDSEQ_File_Path)
 
@@ -611,7 +611,7 @@ if GENERATE_CSV_FILES and GENERATE_SQUARES_OUTPUT:
 		if outputLineCount % 250000 == 1:
 			if outputLineCount != 1:
 				fsqCSV.close()
-				with zipfile.ZipFile(f'{DIR_ZIP}CSV_Squares.zip',zip_mode_csvSq) as zipf:
+				with zipfile.ZipFile(f'{DIR_ZIP}CSV_Squares.zip',zip_mode_csvSq,compression=zipfile.ZIP_DEFLATED,compresslevel=9) as zipf:
 					zipf.write(CSV_File_Path,arcname=CSV_File_Name)
 					delete_file(CSV_File_Path)
 					zip_mode_csvSq = 'a'
@@ -634,7 +634,7 @@ if GENERATE_CSV_FILES and GENERATE_SQUARES_OUTPUT:
 	ct2 = len(splits)
 	splits[ct2] = time.perf_counter()
 	fsqCSV.close()
-	with zipfile.ZipFile(f'{DIR_ZIP}CSV_Squares.zip',zip_mode_csvSq) as zipf:
+	with zipfile.ZipFile(f'{DIR_ZIP}CSV_Squares.zip',zip_mode_csvSq,compression=zipfile.ZIP_DEFLATED,compresslevel=9) as zipf:
 		zipf.write(CSV_File_Path,arcname=CSV_File_Name)
 		delete_file(CSV_File_Path)
 	print(f".csv analysis duration {splits[ct2] - splits[ct]:4.3f} seconds")
@@ -664,7 +664,7 @@ if GENERATE_TXT_FILES and GENERATE_SQUARES_OUTPUT:
 			if pages % SQUARES_PAGES_PER_FILE == 1:
 				if pages > 1:
 					fsqTXT.close()
-					with zipfile.ZipFile(f'{DIR_ZIP}TXT_Squares.zip',zip_mode_txtSq) as zipf:
+					with zipfile.ZipFile(f'{DIR_ZIP}TXT_Squares.zip',zip_mode_txtSq,compression=zipfile.ZIP_DEFLATED,compresslevel=9) as zipf:
 						zipf.write(TXT_File_Path,arcname=TXT_File_Name)
 						delete_file(TXT_File_Path)
 						zip_mode_txtSq = 'a'
@@ -727,7 +727,7 @@ if GENERATE_TXT_FILES and GENERATE_SQUARES_OUTPUT:
 
 		lines += 1
 	fsqTXT.close()
-	with zipfile.ZipFile(f'{DIR_ZIP}TXT_Squares.zip',zip_mode_txtSq) as zipf:
+	with zipfile.ZipFile(f'{DIR_ZIP}TXT_Squares.zip',zip_mode_txtSq,compression=zipfile.ZIP_DEFLATED,compresslevel=9) as zipf:
 		zipf.write(TXT_File_Path,arcname=TXT_File_Name)
 		delete_file(TXT_File_Path)
 	splits[len(splits)] = time.perf_counter()
